@@ -1,90 +1,96 @@
 # Archivo
 
-**Deutsch** · [English](README.en.md)
+[Deutsch](README.de.md) · **English**
 
-Android-App zum Archivieren, Durchsuchen und Lesen von PDFs: Lernunterlagen, Briefe, Formulare und alles,
-was sonst als Papier herumliegt. Dokumente landen in selbst angelegten Kategorien und Unterkategorien
-(z.B. *Schule → Mathe → Analysis*) und lassen sich über ihren **Inhalt** wiederfinden, auch eingescannte Seiten.
+Android app for archiving, searching and reading PDFs: study notes, letters, forms and everything else
+that would otherwise pile up as paper. Documents go into categories and subcategories you create yourself
+(e.g. *School → Maths → Calculus*) and can be found again by their **content**, even scanned pages.
 
-Alles bleibt auf dem Gerät: kein Konto, keine Cloud, Texterkennung offline.
+Everything stays on the device: no account, no cloud, offline text recognition.
 
-## Funktionen
+## Features
 
-### Ordnen
-- Kategorien und beliebig tiefe Unterkategorien als aufklappbarer Baum in der Seitenleiste
-- PDFs importieren (auch mehrere auf einmal), umbenennen, verschieben und löschen
-- Mehrfachauswahl für PDFs und Kategorien: verschieben, löschen, teilen
-- **Teilen → Archivo** aus anderen Apps (z.B. E-Mail, Downloads, Dateimanager)
-- PDFs aus der App heraus teilen, auch ganze Kategorien
+### Organize
+- Categories and subcategories of any depth, shown as an expandable tree in the side drawer
+- Import PDFs (several at once), rename, move and delete them
+- Multi-select for PDFs and categories: move, delete, share
+- **Share → Archivo** from other apps (e.g. email, downloads, file manager)
+- Share PDFs from within the app, including whole categories
 
-### Scannen
-- **Mit dem Drucker scannen** über eSCL/AirScan im WLAN: Scanner werden automatisch gefunden,
-  manuelle IP möglich. Unterstützt Scannerglas, Einzug und **Duplex**.
-- **Leere Rückseiten** werden beim Duplex-Scan automatisch entfernt.
-- **Mit der Kamera scannen** über den ML Kit Document Scanner (Kantenerkennung, Entzerren, Filter)
-- Vorschau vor dem Speichern: Seiten ansehen, drehen, entfernen und per Ziehen umsortieren
-- Scans werden verlustfrei als JPEG ins PDF übernommen (kein erneutes Komprimieren)
+### Scan
+- **Scan with your printer** via eSCL/AirScan over Wi-Fi: scanners are discovered automatically,
+  a manual IP is possible too. Supports flatbed, document feeder and **duplex**.
+- **Blank back pages** are removed automatically when scanning in duplex.
+- **Scan with the camera** using the ML Kit Document Scanner (edge detection, perspective correction, filters)
+- Preview before saving: view, rotate, remove and drag to reorder pages
+- Scans are embedded into the PDF as lossless JPEG passthrough (no re-compression)
 
-### Suchen
-- Suche nach Namen von Kategorien und PDFs
-- **Volltextsuche im PDF-Inhalt** (SQLite FTS4) mit Ausschnitt und allen Trefferseiten
-- Eingescannte Seiten werden per **OCR** (ML Kit, offline) lesbar gemacht
-- Treffer werden im Viewer gelb markiert; mit ◀ ▶ von Trefferseite zu Trefferseite, direkt zum Wort
+### Search
+- Search by category and PDF names
+- **Full-text search in PDF content** (SQLite FTS4) with snippet and all matching pages
+- Scanned pages are made searchable via **OCR** (ML Kit, offline)
+- Matches are highlighted in yellow in the viewer; ◀ ▶ jumps from match to match, right to the word
 
-### Lesen
-- Flüssiger PDF-Viewer mit Pinch-Zoom (1×–3×), Doppeltippen und freiem Schieben in alle Richtungen
-- Genauer Lesestand pro PDF (Seite, Position, Zoom); das zuletzt offene PDF öffnet sich beim Start wieder
-- Einzelne Seiten oder das ganze Dokument dauerhaft drehen
+### Read
+- Smooth PDF viewer with pinch zoom (1×–3×), double tap and free panning in every direction
+- Exact reading position per PDF (page, position, zoom); the last opened PDF reopens on start
+- Permanently rotate single pages or the whole document
 
-## Voraussetzungen
+## Requirements
 
-- Android 6.0 (API 23) oder neuer
-- Kamera-Scan: Google Play-Dienste
-- Drucker-Scan: ein eSCL-fähiger Scanner/Multifunktionsdrucker im selben WLAN
+- Android 6.0 (API 23) or newer
+- Camera scan: Google Play services
+- Printer scan: an eSCL-capable scanner/multifunction printer on the same Wi-Fi
 
-Ab Android 15 liest die App die Textebene von PDFs mit dem eingebauten `PdfRenderer`.
-Auf älteren Versionen übernimmt das PdfBox. Seiten ohne Text (Scans) laufen immer über die OCR.
+On Android 15 and newer the app reads the text layer of PDFs with the built-in `PdfRenderer`.
+On older versions PdfBox does that. Pages without text (scans) always go through OCR.
 
-## Bauen
+## Building
 
-Mit Android Studio öffnen und **Run** drücken, oder auf der Kommandozeile:
+Open in Android Studio and press **Run**, or from the command line:
 
 ```bash
-./gradlew :app:assembleDebug        # APK bauen
-./gradlew :app:installDebug         # auf ein verbundenes Gerät installieren
+./gradlew :app:assembleDebug        # build the APK
+./gradlew :app:installDebug         # install on a connected device
 ```
 
-## Technik
+## Tech
 
-| Bereich | Umsetzung |
+| Area | Implementation |
 |---|---|
-| Sprache | Java 11, ViewBinding |
+| Language | Java 11, ViewBinding |
 | UI | Material 3, Navigation Component, RecyclerView |
-| Architektur | ViewModel + LiveData → Repository → Room / Dateisystem |
-| Datenbank | Room (Kategorien, PDFs, FTS4-Index für den Volltext) |
-| PDF anzeigen | `android.graphics.pdf.PdfRenderer` |
-| PDF bearbeiten / Text vor Android 15 | [PdfBox-Android](https://github.com/TomRoush/PdfBox-Android) |
-| OCR | ML Kit Text Recognition (gebündeltes Modell, offline) |
-| Kamera-Scan | ML Kit Document Scanner |
-| Drucker-Scan | eigener eSCL-Client (`NsdManager` + HTTP/XML), eigener JPEG→PDF-Writer |
+| Architecture | ViewModel + LiveData → Repository → Room / file system |
+| Database | Room (categories, PDFs, FTS4 index for full text) |
+| Displaying PDFs | `android.graphics.pdf.PdfRenderer` |
+| Editing PDFs / text before Android 15 | [PdfBox-Android](https://github.com/TomRoush/PdfBox-Android) |
+| OCR | ML Kit Text Recognition (bundled model, offline) |
+| Camera scan | ML Kit Document Scanner |
+| Printer scan | custom eSCL client (`NsdManager` + HTTP/XML), custom JPEG→PDF writer |
 
-### Projektstruktur
+### Project structure
 
 ```
 app/src/main/java/at/woodexplosive/learnarchiver/
-├── MainActivity.java       Seitenleiste, Suche, Import, Teilen
-├── data/                   Room-Datenbank, DAOs, Repository, PdfIndexer (Volltext + OCR)
-├── scan/                   eSCL-Client, Scanner-Suche, JPEG→PDF, Leerseiten-Erkennung
+├── MainActivity.java       side drawer, search, import, sharing
+├── data/                   Room database, DAOs, repository, PdfIndexer (full text + OCR)
+├── scan/                   eSCL client, scanner discovery, JPEG→PDF, blank page detection
 └── ui/
-    ├── drawer/             Kategorie-Baum, Dialoge
-    ├── viewer/             PDF-Viewer, Renderer, Zoom
-    ├── scan/               Scan-Bildschirm mit Vorschau
-    └── home/               Startseite
+    ├── drawer/             category tree, dialogs
+    ├── viewer/             PDF viewer, renderer, zoom
+    ├── scan/               scan screen with preview
+    └── home/               start screen
 ```
 
-## Datenschutz
+The app is available in **English** and **German**. It follows the device language; on Android 13+ the
+language can also be set per app (Settings → Apps → Archivo → Language).
 
-- PDFs liegen im privaten App-Speicher, die Datenbank ebenfalls.
-- Texterkennung und Suche laufen vollständig auf dem Gerät.
-- Netzwerk wird nur für das Scannen im lokalen WLAN genutzt.
-- Beim Import über „Teilen“ werden nur Dateien fremder Apps angenommen und auf echtes PDF geprüft.
+## Privacy
+
+- PDFs are stored in the app's private storage, as is the database.
+- Text recognition and search run entirely on the device.
+- The network is only used for scanning on the local Wi-Fi.
+- When importing via "Share", only files from other apps are accepted, and they are checked to be real PDFs.
+
+## Disclaimer
+Claude code was used for Documentation in the code and planning some more complex features.

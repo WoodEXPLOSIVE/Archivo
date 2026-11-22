@@ -1,6 +1,7 @@
 *.iml
 .gradle
 /local.properties
+/.idea/
 /.idea/caches
 /.idea/libraries
 /.idea/modules.xml
@@ -19,6 +20,3 @@ local.properties
 /.idea/deviceManager.xml
 /.idea/deploymentTargetSelector.xml
 /.kotlin
-
-# Persönliche Arbeitsnotizen für Claude Code
-CLAUDE.md
