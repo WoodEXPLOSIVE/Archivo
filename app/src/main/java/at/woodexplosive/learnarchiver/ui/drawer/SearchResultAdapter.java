@@ -16,8 +16,10 @@ import androidx.recyclerview.widget.RecyclerView;
 import at.woodexplosive.learnarchiver.R;
 import at.woodexplosive.learnarchiver.databinding.ItemSearchResultBinding;
 
+/** Zeigt die Trefferliste der Suche in der Seitenleiste; der Suchbegriff wird fett hervorgehoben. */
 public class SearchResultAdapter extends ListAdapter<SearchResult, SearchResultAdapter.ViewHolder> {
 
+    /** Antippen eines Treffers */
     public interface Listener {
         void onResultClick(SearchResult result);
     }

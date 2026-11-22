@@ -8,6 +8,10 @@ import java.util.List;
 
 import at.woodexplosive.learnarchiver.data.enitity.PdfText;
 
+/**
+ * Zugriffe auf den Volltextindex {@code pdf_text} (FTS4, eine Zeile pro Seite).
+ * Ohne Foreign Keys – verwaiste Zeilen entfernt {@link #deleteOrphans()}.
+ */
 @Dao
 public interface PdfTextDao {
 

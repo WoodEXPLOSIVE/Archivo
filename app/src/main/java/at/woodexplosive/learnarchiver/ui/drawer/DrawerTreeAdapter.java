@@ -12,7 +12,12 @@ import androidx.recyclerview.widget.RecyclerView;
 import at.woodexplosive.learnarchiver.R;
 import at.woodexplosive.learnarchiver.databinding.ItemTreeBinding;
 
+/**
+ * Zeigt den Kategorie-Baum der Seitenleiste: eingerückte Zeilen mit Pfeil zum Auf-/Zuklappen und
+ * im Auswahlmodus mit Checkbox. DiffUtil sorgt dafür, dass nur geänderte Zeilen neu gezeichnet werden.
+ */
 public class DrawerTreeAdapter extends ListAdapter<TreeItem, DrawerTreeAdapter.ViewHolder> {
+    /** Klicks auf eine Zeile, langes Drücken (Kontextmenü) und Klicks auf den Pfeil */
     public interface Listener {
         void onItemClick(TreeItem item);
         void onItemLongClick(TreeItem item, View anchor);
@@ -50,6 +55,7 @@ public class DrawerTreeAdapter extends ListAdapter<TreeItem, DrawerTreeAdapter.V
         }
     };
 
+    /** Eine Zeile des Baums */
     public static class ViewHolder extends RecyclerView.ViewHolder {
         private final ItemTreeBinding b;
         public ViewHolder(ItemTreeBinding b) {

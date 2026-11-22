@@ -8,6 +8,7 @@ import androidx.room.Query;
 import java.util.List;
 
 import at.woodexplosive.learnarchiver.data.enitity.Category;
+/** Datenbankzugriffe auf die Kategorien. Unterkategorien und PDFs löscht die DB per CASCADE mit. */
 @Dao
 public interface CategoryDao {
     @Insert

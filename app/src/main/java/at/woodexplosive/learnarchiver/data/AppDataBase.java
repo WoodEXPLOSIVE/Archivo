@@ -20,10 +20,19 @@ import at.woodexplosive.learnarchiver.data.enitity.Category;
 import at.woodexplosive.learnarchiver.data.enitity.PdfFile;
 import at.woodexplosive.learnarchiver.data.enitity.PdfText;
 
+/**
+ * Room-Datenbank der Bibliothek (Datei {@code learnarchiver.db}).
+ * <p>
+ * Tabellen: Kategorien, PDFs und der FTS4-Volltextindex. Schema-Änderungen brauchen eine höhere
+ * {@code version} und eine Migration (siehe {@link #MIGRATION_3_4}), sonst wird die DB neu angelegt.
+ */
 @Database(entities = {Category.class, PdfFile.class, PdfText.class}, version = 4, exportSchema = false)
 public abstract class AppDataBase extends RoomDatabase {
+    /** Zugriff auf die Kategorien */
     public abstract CategoryDao categoryDao();
+    /** Zugriff auf die PDF-Einträge */
     public abstract PdfFileDao pdfFileDao();
+    /** Zugriff auf den Volltextindex (Text je Seite) */
     public abstract PdfTextDao pdfTextDao();
 
     private static volatile AppDataBase INSTANCE;
@@ -41,8 +50,16 @@ public abstract class AppDataBase extends RoomDatabase {
         }
     };
 
+    /**
+     * Ein Thread für alle DB-Schreibzugriffe: Room verbietet DB-Zugriffe auf dem Main-Thread, und
+     * nacheinander ausgeführt kommen sich Aktionen nicht in die Quere.
+     */
     public static final ExecutorService dbExecutor = Executors.newSingleThreadExecutor();
 
+    /**
+     * Die eine Datenbank-Instanz der App (wird beim ersten Aufruf angelegt, thread-sicher).
+     * @param context beliebiger Context – intern wird der Application-Context verwendet
+     */
     public static AppDataBase getInstance(Context context) {
         if (INSTANCE == null) {
             synchronized (AppDataBase.class) {

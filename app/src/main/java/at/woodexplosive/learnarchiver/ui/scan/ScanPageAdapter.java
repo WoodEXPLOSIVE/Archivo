@@ -32,6 +32,7 @@ import at.woodexplosive.learnarchiver.scan.JpegPdfWriter;
  */
 public class ScanPageAdapter extends RecyclerView.Adapter<ScanPageAdapter.Holder> {
 
+    /** Antippen (große Ansicht), Drehen und Entfernen einer Seite */
     public interface Listener {
         void onPageClick(int position, JpegPdfWriter.Page page);
         void onPageRotate(int position);
@@ -57,6 +58,9 @@ public class ScanPageAdapter extends RecyclerView.Adapter<ScanPageAdapter.Holder
         this.listener = listener;
     }
 
+    /**
+     * Neue Seitenliste aus dem ViewModel übernehmen (unverändert → nichts tun, z.B. während des Ziehens)
+     */
     public void setPages(List<JpegPdfWriter.Page> newPages) {
         if (pages.equals(newPages)) return;
         pages.clear();
@@ -139,6 +143,7 @@ public class ScanPageAdapter extends RecyclerView.Adapter<ScanPageAdapter.Holder
         return pages.size();
     }
 
+    /** Hintergrund-Thread beenden und Vorschaubilder freigeben – in onDestroyView aufrufen */
     public void shutdown() {
         decoder.shutdownNow();
         cache.evictAll();

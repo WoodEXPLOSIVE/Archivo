@@ -47,6 +47,10 @@ public class EsclClient {
     /** Wie lange wir bei "503 – noch beschäftigt" maximal warten (je 1 s) */
     private static final int MAX_BUSY_RETRIES = 90;
 
+    /**
+     * Was der Scanner kann: Glas/Einzug/Duplex, Auflösungen, Farbmodi, Formate und maximale Fläche
+     * (in 1/300 Zoll). Aus {@code /ScannerCapabilities} gelesen.
+     */
     public static class Capabilities {
         public String model = "";
         public String version = "2.0";
@@ -70,8 +74,10 @@ public class EsclClient {
         }
     }
 
+    /** Fehlerursachen, für die es eine eigene Meldung gibt */
     public enum Reason { BUSY, ADF_EMPTY, NO_JPEG, HTTP }
 
+    /** Meldet den Fortschritt eines Scan-Auftrags (auf dem Scan-Thread) */
     public interface PageListener {
         /** Seite empfangen (1-basiert, innerhalb dieses Scan-Auftrags) */
         void onPage(int pageNumber);
@@ -87,6 +93,10 @@ public class EsclClient {
     // Fähigkeiten + Status
     // =====================================================================
 
+    /**
+     * Fähigkeiten des Scanners abfragen.
+     * @throws IOException Scanner nicht erreichbar oder Antwort unbrauchbar
+     */
     public Capabilities getCapabilities() throws IOException {
         HttpURLConnection c = open(baseUrl + "/ScannerCapabilities", "GET", 8000);
         try {

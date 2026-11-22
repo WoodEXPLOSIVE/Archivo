@@ -8,6 +8,10 @@ import androidx.room.ForeignKey;
 import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
+/**
+ * Eine Kategorie der Bibliothek. {@link #parentId} zeigt auf die Eltern-Kategorie
+ * (null = oberste Ebene), so entsteht ein beliebig tiefer Baum.
+ */
 @Entity(
         tableName = "categories",
         foreignKeys = @ForeignKey(

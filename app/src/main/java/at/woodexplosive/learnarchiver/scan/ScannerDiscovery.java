@@ -27,6 +27,7 @@ public class ScannerDiscovery {
     private static final String TAG = "ScannerDiscovery";
     private static final String SERVICE_TYPE = "_uscan._tcp";
 
+    /** Wird für jeden gefundenen und aufgelösten Scanner aufgerufen (auf einem Hintergrund-Thread!) */
     public interface Listener {
         void onScannerFound(EsclScanner scanner);
     }
@@ -63,12 +64,16 @@ public class ScannerDiscovery {
         public void onStopDiscoveryFailed(String type, int errorCode) {}
     };
 
+    /** Suche im WLAN starten (mehrfacher Aufruf ist harmlos) */
     public synchronized void start() {
         if (running || nsd == null) return;
         running = true;
         nsd.discoverServices(SERVICE_TYPE, NsdManager.PROTOCOL_DNS_SD, discoveryListener);
     }
 
+    /**
+     * Suche beenden und ausstehende Auflösungen verwerfen – spätestens beim Verlassen des Bildschirms aufrufen
+     */
     public synchronized void stop() {
         if (!running) return;
         running = false;

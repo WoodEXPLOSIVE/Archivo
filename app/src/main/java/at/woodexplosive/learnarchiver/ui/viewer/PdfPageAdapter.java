@@ -14,6 +14,11 @@ import java.util.List;
 
 import at.woodexplosive.learnarchiver.databinding.ItemPdfPageBinding;
 
+/**
+ * Eine Zeile pro PDF-Seite. Setzt Breite und Höhe jeder Seite selbst (Seitenbreite × Seitenverhältnis),
+ * damit die Liste schon vor dem Rendern richtig scrollt. Gerendert wird höchstens in doppelter
+ * Bildschirmbreite (Speicher) – darüber wird das Bild gestreckt.
+ */
 @SuppressLint("NotifyDataSetChanged")
 public class PdfPageAdapter extends RecyclerView.Adapter<PdfPageAdapter.PageHolder> {
     private final PdfDocumentRenderer renderer;
@@ -26,6 +31,11 @@ public class PdfPageAdapter extends RecyclerView.Adapter<PdfPageAdapter.PageHold
         this.maxRenderWidth = screenWidth * 2;
     }
 
+    /**
+     * Seiten festlegen.
+     * @param aspectRatios Höhe/Breite jeder Seite
+     * @param pageWidth    angezeigte Seitenbreite in Pixeln
+     */
     public void setPages(List<Float> aspectRatios, int pageWidth) {
         this.aspectRatios = aspectRatios;
         this.pageWidth = pageWidth;
@@ -47,6 +57,9 @@ public class PdfPageAdapter extends RecyclerView.Adapter<PdfPageAdapter.PageHold
         return Math.min(pageWidth, maxRenderWidth);
     }
 
+    /**
+     * Neue Seitenbreite nach dem Zoomen; alle Seiten werden neu vermessen und ggf. schärfer gerendert
+     */
     public void setPageWidth(int pageWidth) {
         this.pageWidth = pageWidth;
         notifyDataSetChanged();
@@ -88,6 +101,10 @@ public class PdfPageAdapter extends RecyclerView.Adapter<PdfPageAdapter.PageHold
         return aspectRatios.size();
     }
 
+    /**
+     * Eine Seite. {@code boundPage} verhindert, dass ein verspätet fertiges Bild in einer
+     * inzwischen wiederverwendeten Zeile landet.
+     */
     public static class PageHolder extends RecyclerView.ViewHolder {
         final ItemPdfPageBinding b;
         int boundPage = -1;

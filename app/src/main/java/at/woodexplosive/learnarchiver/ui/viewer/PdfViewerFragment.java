@@ -26,6 +26,13 @@ import at.woodexplosive.learnarchiver.data.enitity.PdfFile;
 import at.woodexplosive.learnarchiver.databinding.FragmentPdfViewerBinding;
 import at.woodexplosive.learnarchiver.ui.LibraryViewModel;
 
+/**
+ * Zeigt ein PDF als senkrechte Seitenliste mit Zoom, freiem Schieben und Lesestand.
+ * <p>
+ * Argumente: {@code ARG_PDF_ID}, Dateiname, optional {@code ARG_START_PAGE} und {@code ARG_HIGHLIGHT}
+ * (aus der Inhaltssuche – dann mit Trefferleiste zum Springen zwischen den Trefferseiten).
+ * Außerdem: Seiten dauerhaft drehen und das PDF teilen.
+ */
 public class PdfViewerFragment extends Fragment {
     private static final float MIN_ZOOM = 1f;
     private static final float MAX_ZOOM = 3f;

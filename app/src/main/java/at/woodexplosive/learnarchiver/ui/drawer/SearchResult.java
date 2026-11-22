@@ -27,10 +27,19 @@ public class SearchResult {
         this.page = page;
     }
 
+    /**
+     * Treffer auf eine Kategorie.
+     * @param path Pfad der Eltern-Kategorien, z.B. "Mathe › Analysis"
+     */
     public static SearchResult category(long id, String name, String path) {
         return new SearchResult(TYPE_CATEGORY, id, name, path, null, -1);
     }
 
+    /**
+     * Treffer auf ein PDF.
+     * @param subtitle Kategoriepfad (Namenssuche) oder Textausschnitt (Inhaltssuche)
+     * @param page     erste Trefferseite (0-basiert), -1 bei Namenssuche
+     */
     public static SearchResult pdf(PdfFile pdf, String subtitle, int page) {
         return new SearchResult(TYPE_PDF, pdf.id, pdf.displayName, subtitle, pdf, page);
     }

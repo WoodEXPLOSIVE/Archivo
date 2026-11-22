@@ -43,6 +43,13 @@ import at.woodexplosive.learnarchiver.ui.drawer.TreeItem;
 import at.woodexplosive.learnarchiver.ui.scan.ScanFragment;
 import at.woodexplosive.learnarchiver.ui.viewer.PdfViewerFragment;
 
+/**
+ * Einzige Activity der App: Toolbar, Seitenleiste (Kategorie-Baum, Suche, Mehrfachauswahl) und der
+ * NavHost mit Startseite, PDF-Viewer und Scan-Bildschirm.
+ * <p>
+ * Kümmert sich außerdem um den PDF-Import (Dateiauswahl), den Kamera-Scan, "Teilen → Archivo"
+ * aus anderen Apps und öffnet beim Start das zuletzt gelesene PDF wieder.
+ */
 public class MainActivity extends AppCompatActivity {
 
     private ActivityMainBinding binding;

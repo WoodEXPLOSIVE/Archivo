@@ -12,6 +12,7 @@ import androidx.fragment.app.Fragment;
 import at.woodexplosive.learnarchiver.R;
 import at.woodexplosive.learnarchiver.databinding.FragmentHomeBinding;
 
+/** Startseite, solange kein PDF geöffnet ist. Zeigt nur den App-Namen in der Toolbar. */
 public class HomeFragment extends Fragment {
     private FragmentHomeBinding binding;
 

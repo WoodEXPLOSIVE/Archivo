@@ -9,6 +9,9 @@ import java.util.List;
 
 import at.woodexplosive.learnarchiver.data.enitity.PdfFile;
 
+/**
+ * Datenbankzugriffe auf die PDF-Einträge: anlegen, umbenennen, verschieben, Lesestand und Index-Status.
+ */
 @Dao
 public interface PdfFileDao {
     @Insert

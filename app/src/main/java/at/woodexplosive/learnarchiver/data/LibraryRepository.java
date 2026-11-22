@@ -38,6 +38,14 @@ import at.woodexplosive.learnarchiver.data.dao.PdfTextDao;
 import at.woodexplosive.learnarchiver.data.enitity.Category;
 import at.woodexplosive.learnarchiver.data.enitity.PdfFile;
 
+/**
+ * Zentrale Stelle für alle Daten der Bibliothek: Datenbank, PDF-Dateien und Einstellungen.
+ * <p>
+ * Alle Methoden kehren sofort zurück. Die Arbeit läuft im Hintergrund (DB auf
+ * {@link AppDataBase#dbExecutor}, Datei-Umbauten auf einem eigenen Thread), Ergebnisse kommen
+ * über Callbacks auf dem Main-Thread. Änderungen an der DB melden sich zusätzlich über die LiveData
+ * von {@link #getCategories()} und {@link #getPdfFiles()}.
+ */
 public class LibraryRepository {
     private final AppDataBase db;
     private final CategoryDao categoryDao;
@@ -58,6 +66,7 @@ public class LibraryRepository {
         void onResult(T value);
     }
 
+    /** Ergebnis eines Imports, auf dem Main-Thread */
     @FunctionalInterface
     public interface ImportCallback {
         void onImportFinish(int imported, int failed);
@@ -133,18 +142,24 @@ public class LibraryRepository {
         });
     }
 
+    /** Alle Kategorien, aktualisiert sich bei jeder Änderung */
     public LiveData<List<Category>> getCategories() {
         return categoryDao.getAll();
     }
 
+    /** Alle PDFs, aktualisiert sich bei jeder Änderung (auch beim Lesestand und Index-Status) */
     public LiveData<List<PdfFile>> getPdfFiles() {
         return pdfFileDao.getAll();
     }
 
+    /** Die Datei eines PDFs im privaten Speicher */
     public File getFile(PdfFile pdf) {
         return getFile(pdf.filePath);
     }
 
+    /**
+     * Die Datei zu einem gespeicherten Dateinamen ({@link PdfFile#filePath})
+     */
     public File getFile(String fileName) {
         return new File(pdfDir, fileName);
     }
@@ -234,10 +249,16 @@ public class LibraryRepository {
         indexer.indexPending();
     }
 
+    /** Anzahl der PDFs, deren Inhalt noch ausgelesen wird (für den Hinweis bei der Inhaltssuche) */
     public LiveData<Integer> countPendingIndex() {
         return pdfFileDao.countPendingIndex();
     }
 
+    /**
+     * Volltextsuche über alle PDFs.
+     * @param ftsQuery fertige FTS4-Abfrage, z.B. {@code "ableit*"}
+     * @param callback Treffer (eine Zeile pro Seite); bei ungültiger Abfrage leer
+     */
     public void searchContent(String ftsQuery, ResultCallback<List<ContentHit>> callback) {
         executor.execute(() -> {
             List<ContentHit> hits;
@@ -255,6 +276,7 @@ public class LibraryRepository {
 
     // ---------- Lesestand ----------
 
+    /** Ein PDF frisch aus der DB laden (null, wenn es nicht mehr existiert) */
     public void getPdf(long id, ResultCallback<PdfFile> callback) {
         executor.execute(() -> {
             PdfFile pdf = pdfFileDao.getById(id);
@@ -262,6 +284,13 @@ public class LibraryRepository {
         });
     }
 
+    /**
+     * Genauen Lesestand speichern.
+     * @param page       oberste sichtbare Seite (0-basiert)
+     * @param pageOffset wie weit in diese Seite gescrollt ist, in Seitenbreiten
+     * @param zoom       Zoomfaktor (1 = Bildschirmbreite)
+     * @param scrollX    waagrechte Position als Anteil der Inhaltsbreite
+     */
     public void saveReadingPosition(long pdfId, int page, float pageOffset, float zoom, float scrollX) {
         executor.execute(() -> pdfFileDao.setReadingPosition(pdfId, page, pageOffset, zoom, scrollX));
     }
@@ -281,6 +310,7 @@ public class LibraryRepository {
         });
     }
 
+    /** Merkt sich das gerade geöffnete PDF, damit es beim nächsten Start wieder aufgeht */
     public void setLastOpenedPdf(long pdfId) {
         prefs.edit().putLong(KEY_LAST_OPENED_PDF, pdfId).apply();
     }
@@ -302,14 +332,23 @@ public class LibraryRepository {
         getPdf(id, callback);
     }
 
+    /**
+     * Kategorie (samt Inhalt) verschieben.
+     * @param newParentId neue Eltern-Kategorie, null = oberste Ebene
+     */
     public void moveCategory(long categoryId, Long newParentId) {
         executor.execute(() -> categoryDao.move(categoryId, newParentId));
     }
 
+    /** PDF in eine andere Kategorie verschieben (die Datei selbst bleibt liegen) */
     public void movePdf(long pdfId, long categoryId) {
         executor.execute(() -> pdfFileDao.move(pdfId, categoryId));
     }
 
+    /**
+     * Neue Kategorie anlegen.
+     * @param parentId Eltern-Kategorie, null = oberste Ebene
+     */
     public void addCategory(String name, Long parentId) {
         executor.execute(() -> categoryDao.insert(new Category(name, parentId)));
     }
@@ -357,10 +396,12 @@ public class LibraryRepository {
         }
     }
 
+    /** Kategorie umbenennen */
     public void renameCategory(long id, String newName) {
         executor.execute(() -> categoryDao.rename(id, newName));
     }
 
+    /** Kategorie mit allen Unterkategorien und PDFs löschen – auch die Dateien und ihren Suchindex */
     public void deleteCategory(long id) {
         executor.execute(() -> {
             List<String> fileNames = new ArrayList<>();
@@ -375,10 +416,12 @@ public class LibraryRepository {
         });
     }
 
+    /** Anzeigenamen eines PDFs ändern (der Dateiname bleibt die UUID) */
     public void renamePdf(long id, String newName) {
         executor.execute(() -> pdfFileDao.rename(id, newName));
     }
 
+    /** PDF löschen: DB-Eintrag, Suchindex und Datei */
     public void deletePdf(PdfFile pdf) {
         executor.execute(() -> {
             db.runInTransaction(() -> {
@@ -389,6 +432,12 @@ public class LibraryRepository {
         });
     }
 
+    /**
+     * PDFs aus anderen Apps (Dateiauswahl oder "Teilen") in eine Kategorie kopieren und anschließend
+     * im Hintergrund für die Suche auslesen. Nur content://-Uris fremder Apps, die wirklich PDFs sind,
+     * werden angenommen – der Rest zählt als fehlgeschlagen.
+     * @param callback Anzahl importierter und fehlgeschlagener Dateien
+     */
     public void importPdfs(long categoryId, List<Uri> uris, ImportCallback callback) {
         executor.execute(() -> {
             int imported = 0;

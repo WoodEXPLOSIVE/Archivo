@@ -17,7 +17,12 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import at.woodexplosive.learnarchiver.R;
 import at.woodexplosive.learnarchiver.databinding.DialogNameInputBinding;
 
+/**
+ * Wiederverwendbarer Dialog zum Eingeben eines Namens (neue Kategorie, Umbenennen, …).
+ * "Speichern" ist nur aktiv, solange ein Name eingegeben ist.
+ */
 public final class NameInputDialog {
+    /** Liefert den eingegebenen Namen (ohne Leerzeichen am Rand) */
     @FunctionalInterface
     public interface OnNameEntered {
         void onNameEntered(@Nullable String name);
@@ -25,6 +30,10 @@ public final class NameInputDialog {
 
     private NameInputDialog() {}
 
+    /**
+     * Dialog anzeigen.
+     * @param initialText vorbelegter Text (ist markiert), z.B. der alte Name beim Umbenennen
+     */
     public static void show(Context context, @StringRes int titleRes,
                             String initialText, OnNameEntered callback) {
         DialogNameInputBinding b = DialogNameInputBinding.inflate(LayoutInflater.from(context));

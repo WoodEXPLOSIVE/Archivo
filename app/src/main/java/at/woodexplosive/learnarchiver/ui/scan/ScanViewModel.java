@@ -80,11 +80,16 @@ public class ScanViewModel extends AndroidViewModel {
         discovery = new ScannerDiscovery(app, this::addScanner);
     }
 
+    /** Alle bisher im WLAN gefundenen Scanner */
     public LiveData<List<EsclScanner>> getScanners() { return scanners; }
+    /** Der ausgewählte Scanner */
     public LiveData<EsclScanner> getSelected() { return selected; }
+    /** Fähigkeiten des ausgewählten Scanners (null, solange sie geladen werden) */
     public LiveData<EsclClient.Capabilities> getCapabilities() { return capabilities; }
+    /** Aktueller Zustand für die Anzeige: Statusmeldung, gescannte Seiten, fertiges PDF */
     public LiveData<State> getState() { return state; }
 
+    /** Scanner im WLAN suchen; der erste gefundene wird automatisch ausgewählt */
     public void startDiscovery() {
         discovery.start();
     }
@@ -100,6 +105,7 @@ public class ScanViewModel extends AndroidViewModel {
         }
     }
 
+    /** Anderen Scanner auswählen und seine Fähigkeiten laden */
     public void select(EsclScanner scanner) {
         if (scanner.equals(selected.getValue())) return;
         selectAsync(scanner);
@@ -212,6 +218,7 @@ public class ScanViewModel extends AndroidViewModel {
         });
     }
 
+    /** Laufenden Scan abbrechen (schon empfangene Seiten bleiben erhalten) */
     public void cancelScan() {
         if (currentTask != null) currentTask.cancel(true);
     }

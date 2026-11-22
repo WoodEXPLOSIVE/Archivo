@@ -23,6 +23,10 @@ public final class ShareHelper {
 
     private ShareHelper() {}
 
+    /**
+     * PDFs über das Android-Teilen-Menü weitergeben (eines oder mehrere, Archivo selbst ausgeblendet).
+     * Bei leerer Liste oder Fehler erscheint ein Toast.
+     */
     public static void share(Activity activity, LibraryViewModel viewModel, List<PdfFile> pdfs) {
         if (pdfs.isEmpty()) {
             Toast.makeText(activity, R.string.share_nothing, Toast.LENGTH_SHORT).show();

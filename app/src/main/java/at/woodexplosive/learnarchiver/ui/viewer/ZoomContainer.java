@@ -23,6 +23,7 @@ import androidx.annotation.Nullable;
  */
 public class ZoomContainer extends FrameLayout {
 
+    /** Meldet Zoom-, Doppeltipp- und Schiebe-Gesten an den Viewer. Koordinaten relativ zum Container. */
     public interface ZoomListener {
         void onZoom(float gestureScale, float focusX, float focusY);
         void onZoomEnd(float gestureScale, float focusX, float focusY);
@@ -90,6 +91,7 @@ public class ZoomContainer extends FrameLayout {
         });
     }
 
+    /** Empfänger der Gesten setzen (ohne Listener werden alle Berührungen normal weitergereicht) */
     public void setZoomListener(ZoomListener listener) {
         this.listener = listener;
     }

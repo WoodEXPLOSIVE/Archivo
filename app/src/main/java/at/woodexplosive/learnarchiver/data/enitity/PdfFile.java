@@ -8,6 +8,11 @@ import androidx.room.ForeignKey;
 import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
+/**
+ * Ein PDF der Bibliothek. Die Datei liegt unter {@code files/pdfs/} mit einem UUID-Namen
+ * ({@link #filePath}), angezeigt wird {@link #displayName}. Speichert außerdem den Lesestand
+ * und ob der Inhalt schon für die Suche ausgelesen wurde.
+ */
 @Entity(
         tableName = "pdf_files",
         foreignKeys = @ForeignKey(

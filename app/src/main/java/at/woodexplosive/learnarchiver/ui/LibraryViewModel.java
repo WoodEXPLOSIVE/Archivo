@@ -30,6 +30,13 @@ import at.woodexplosive.learnarchiver.data.enitity.PdfFile;
 import at.woodexplosive.learnarchiver.ui.drawer.SearchResult;
 import at.woodexplosive.learnarchiver.ui.drawer.TreeItem;
 
+/**
+ * Gemeinsames ViewModel von MainActivity und allen Fragments ({@code requireActivity()} als Owner).
+ * <p>
+ * Baut aus Kategorien und PDFs den sichtbaren Baum der Seitenleiste ({@link #getTree()}), verwaltet
+ * Auf-/Zuklappen, Mehrfachauswahl und Suche und reicht alle Änderungen an das
+ * {@link LibraryRepository} weiter.
+ */
 public class LibraryViewModel extends AndroidViewModel {
 
     private final LibraryRepository repository;
@@ -89,10 +96,12 @@ public class LibraryViewModel extends AndroidViewModel {
     // Suche
     // =====================================================================
 
+    /** Trefferliste der aktuellen Suche (leer, wenn nichts gesucht wird) */
     public LiveData<List<SearchResult>> getSearchResults() {
         return searchResults;
     }
 
+    /** Anzahl der PDFs, deren Inhalt noch ausgelesen wird */
     public LiveData<Integer> getPendingIndexCount() {
         return repository.countPendingIndex();
     }
@@ -118,6 +127,7 @@ public class LibraryViewModel extends AndroidViewModel {
         }
     }
 
+    /** Inhaltssuche ein-/ausschalten und sofort neu suchen */
     public void setContentSearch(boolean enabled) {
         if (enabled == contentSearch) return;
         contentSearch = enabled;
@@ -289,12 +299,14 @@ public class LibraryViewModel extends AndroidViewModel {
         return repository.getPdfFiles();
     }
 
+    /** Datei zu einem gespeicherten Dateinamen */
     public File getPdfFile(String fileName) {
         return repository.getFile(fileName);
     }
 
     // ---------- Lesestand ----------
 
+    /** Ein PDF frisch aus der DB laden (null, wenn gelöscht) */
     public void getPdf(long id, LibraryRepository.ResultCallback<PdfFile> callback) {
         repository.getPdf(id, callback);
     }
@@ -311,6 +323,9 @@ public class LibraryViewModel extends AndroidViewModel {
         });
     }
 
+    /**
+     * Lesestand speichern, siehe {@link LibraryRepository#saveReadingPosition}
+     */
     public void saveReadingPosition(long pdfId, int page, float pageOffset, float zoom, float scrollX) {
         repository.saveReadingPosition(pdfId, page, pageOffset, zoom, scrollX);
     }
@@ -325,18 +340,22 @@ public class LibraryViewModel extends AndroidViewModel {
         repository.findHitPages(fts, pdfId, callback);
     }
 
+    /** Merkt sich das geöffnete PDF für den nächsten App-Start */
     public void setLastOpenedPdf(long pdfId) {
         repository.setLastOpenedPdf(pdfId);
     }
 
+    /** Vergisst das zuletzt geöffnete PDF – aber nur, wenn noch genau dieses eingetragen ist */
     public void clearLastOpenedPdf(long pdfId) {
         repository.clearLastOpenedPdf(pdfId);
     }
 
+    /** Das zuletzt geöffnete PDF oder null */
     public void getLastOpenedPdf(LibraryRepository.ResultCallback<PdfFile> callback) {
         repository.getLastOpenedPdf(callback);
     }
 
+    /** PDF verschieben; die Ziel-Kategorie wird aufgeklappt, damit man es gleich sieht */
     public void movePdf(long pdfId, long targetCategoryId) {
         expandedIds.add(targetCategoryId);
         repository.movePdf(pdfId, targetCategoryId);
@@ -348,6 +367,7 @@ public class LibraryViewModel extends AndroidViewModel {
         else afterCategoriesLoaded.add(action);
     }
 
+    /** Kategorie anlegen und ihre neue ID zurückmelden (z.B. um gleich hinein zu importieren) */
     public void addCategory(String name, Long parentId, LibraryRepository.ResultCallback<Long> callback) {
         if (parentId != null) expandedIds.add(parentId);
         repository.addCategory(name, parentId, callback);
@@ -359,6 +379,10 @@ public class LibraryViewModel extends AndroidViewModel {
         repository.saveScannedPdf(categoryId, name, pdf, callback);
     }
 
+    /**
+     * Kategorie anlegen; die Eltern-Kategorie wird aufgeklappt.
+     * @param parentId Eltern-Kategorie, null = oberste Ebene
+     */
     public void addCategory(String name, Long parentId) {
         if (parentId != null) {
             expandedIds.add(parentId);
@@ -370,6 +394,7 @@ public class LibraryViewModel extends AndroidViewModel {
         repository.renameCategory(id, newName);
     }
 
+    /** Kategorie samt Unterkategorien, PDFs und Dateien löschen */
     public void deleteCategory(long id) {
         repository.deleteCategory(id);
     }
@@ -382,10 +407,14 @@ public class LibraryViewModel extends AndroidViewModel {
         repository.deletePdf(pdf);
     }
 
+    /**
+     * Sichtbare Zeilen der Seitenleiste als flache Liste (nur aufgeklappte Kategorien zeigen ihren Inhalt)
+     */
     public LiveData<List<TreeItem>> getTree() {
         return tree;
     }
 
+    /** Kategorie auf- bzw. zuklappen */
     public void toggleExpanded(long categoryId) {
         if (!expandedIds.remove(categoryId)) expandedIds.add(categoryId);
         rebuildTree();
@@ -398,6 +427,9 @@ public class LibraryViewModel extends AndroidViewModel {
         return id;
     }
 
+    /**
+     * PDFs zum Teilen vorbereiten, siehe {@link LibraryRepository#prepareShare}
+     */
     public void prepareShare(List<PdfFile> pdfs, LibraryRepository.ResultCallback<java.util.ArrayList<Uri>> callback) {
         repository.prepareShare(pdfs, callback);
     }
@@ -421,10 +453,15 @@ public class LibraryViewModel extends AndroidViewModel {
         return result;
     }
 
+    /** Ziel-Kategorie merken, bevor die Dateiauswahl bzw. der Kamera-Scanner geöffnet wird */
     public void setPendingImportCategoryId(long categoryId) {
         pendingImportCategoryId = categoryId;
     }
 
+    /**
+     * Ausgewählte PDFs in die vorher gemerkte Kategorie importieren
+     * (siehe {@link #setPendingImportCategoryId}). Ohne gemerkte Kategorie passiert nichts.
+     */
     public void importPdfs(List<Uri> uris, LibraryRepository.ImportCallback callback) {
         Long categoryId = pendingImportCategoryId;
         pendingImportCategoryId = null;
@@ -456,10 +493,12 @@ public class LibraryViewModel extends AndroidViewModel {
         }
     }
 
+    /** Ist die Mehrfachauswahl aktiv? (Seitenleiste zeigt dann Checkboxen und die Auswahl-Kopfzeile) */
     public LiveData<Boolean> getSelectionMode() {
         return selectionModeLive;
     }
 
+    /** Anzahl der markierten Elemente */
     public LiveData<Integer> getSelectedCount() {
         return selectedCount;
     }
@@ -475,6 +514,7 @@ public class LibraryViewModel extends AndroidViewModel {
         updateSelection();
     }
 
+    /** Markierung eines Elements umschalten */
     public void toggleSelection(TreeItem item) {
         Set<Long> set = selectionSetFor(item);
         if (!set.remove(item.id)) set.add(item.id);
@@ -491,6 +531,7 @@ public class LibraryViewModel extends AndroidViewModel {
         updateSelection();
     }
 
+    /** Mehrfachauswahl beenden und alle Markierungen entfernen */
     public void clearSelection() {
         if (!selectionMode) return;
         selectionMode = false;
@@ -538,6 +579,7 @@ public class LibraryViewModel extends AndroidViewModel {
         clearSelection();
     }
 
+    /** Alle markierten Elemente löschen (Kategorien samt Inhalt) und die Auswahl beenden */
     public void deleteSelection() {
         Selection sel = getEffectiveSelection();
         if (sel.isEmpty()) return;
@@ -583,6 +625,7 @@ public class LibraryViewModel extends AndroidViewModel {
         tree.setValue(result);
     }
 
+    /** Alle Kategorien als flache, eingerückte Liste – z.B. für "Verschieben nach" */
     public List<TreeItem> getAllCategoriesFlat() {
         return getAllCategoriesFlat(Collections.<Long>emptySet());
     }
@@ -619,6 +662,10 @@ public class LibraryViewModel extends AndroidViewModel {
         return null;
     }
 
+    /**
+     * Kategorie verschieben; das Ziel wird aufgeklappt.
+     * @param newParentId neue Eltern-Kategorie, null = oberste Ebene
+     */
     public void moveCategory(long categoryId, Long newParentId) {
         if (newParentId != null) {
             expandedIds.add(newParentId);
@@ -626,6 +673,7 @@ public class LibraryViewModel extends AndroidViewModel {
         repository.moveCategory(categoryId, newParentId);
     }
 
+    /** PDFs nach ihrer Kategorie gruppieren (Schlüssel = Kategorie-ID) */
     @NonNull
     public Map<Long, List<PdfFile>> pdfByCategory(List<PdfFile> pdfFiles) {
         Map<Long, List<PdfFile>> pdfByCategory = new HashMap<>();
@@ -640,6 +688,7 @@ public class LibraryViewModel extends AndroidViewModel {
         return pdfByCategory;
     }
 
+    /** Kategorien nach ihrer Eltern-Kategorie gruppieren (Schlüssel null = oberste Ebene) */
     @NonNull
     public Map<Long, List<Category>> groupByParent(List<Category> categories) {
         Map<Long , List<Category>> childrenByParent = new HashMap<>();

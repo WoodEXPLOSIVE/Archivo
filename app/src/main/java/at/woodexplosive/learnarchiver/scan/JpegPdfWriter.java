@@ -42,10 +42,12 @@ public final class JpegPdfWriter {
             this.rotation = ((rotation % 360) + 360) % 360;
         }
 
+        /** Die JPEG-Datei der Seite */
         public File jpegFile() {
             return jpeg;
         }
 
+        /** Drehung im Uhrzeigersinn: 0, 90, 180 oder 270 */
         public int rotation() {
             return rotation;
         }
@@ -70,6 +72,11 @@ public final class JpegPdfWriter {
 
     private JpegPdfWriter() {}
 
+    /**
+     * Schreibt ein PDF mit einer Seite pro JPEG, in der Reihenfolge der Liste. Die Seitengröße ergibt
+     * sich aus Pixeln und dpi, die Drehung wird als {@code /Rotate} eingetragen.
+     * @throws IOException keine Seiten, kein gültiges JPEG oder Schreibfehler
+     */
     public static void write(List<Page> pages, File out) throws IOException {
         if (pages.isEmpty()) throw new IOException("Keine Seiten");
 

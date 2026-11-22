@@ -45,16 +45,27 @@ import java.util.concurrent.Executors;
 
 import at.woodexplosive.learnarchiver.data.PdfIndexer;
 
+/**
+ * Rendert die Seiten eines PDFs als Bitmaps und markiert dabei Suchtreffer gelb.
+ * <p>
+ * Alles läuft auf EINEM Hintergrund-Thread, weil {@link android.graphics.pdf.PdfRenderer} nicht
+ * thread-sicher ist und nur eine offene Seite gleichzeitig erlaubt. Fertige Seiten landen in einem
+ * LruCache. Callbacks kommen auf dem Main-Thread.
+ */
 public class PdfDocumentRenderer {
     private static final String TAG = "PdfDocumentRenderer";
     /** Weniger Text auf der Seite → eingescannt → Treffer per OCR suchen (wie im PdfIndexer) */
     private static final int MIN_TEXT_CHARS = 20;
 
+    /**
+     * Ergebnis von {@link #open}: Seitenverhältnisse (Höhe/Breite) aller Seiten oder ein Fehler
+     */
     public interface OpenCallback {
         void onOpened(List<Float> aspectRatios);
         void onError(Exception e);
     }
 
+    /** Eine Seite ist fertig gerendert */
     @FunctionalInterface
     public interface RenderCallback {
         void onPageRendered(int index, Bitmap bitmap);
@@ -105,6 +116,10 @@ public class PdfDocumentRenderer {
         highlightTerms = terms;
     }
 
+    /**
+     * PDF öffnen und die Seitenverhältnisse aller Seiten sammeln (für die Größe der Platzhalter).
+     * Fehler: Datei fehlt, ist kaputt oder passwortgeschützt.
+     */
     public void open(File file, OpenCallback callback) {
         executor.execute(() -> {
             try {
@@ -126,10 +141,15 @@ public class PdfDocumentRenderer {
         });
     }
 
+    /** Schon gerenderte Seite aus dem Cache, sonst null (beliebige Breite – ggf. neu rendern) */
     public Bitmap getChached(int index) {
         return chache.get(index);
     }
 
+    /**
+     * Seite in der gewünschten Breite liefern – aus dem Cache oder neu gerendert (inkl. Markierung).
+     * @param width Breite in Pixeln, die Höhe ergibt sich aus dem Seitenverhältnis
+     */
     public void render(int index, int width, RenderCallback callback) {
         executor.execute(() -> {
             if (renderer == null) return;
@@ -404,6 +424,10 @@ public class PdfDocumentRenderer {
         return decomposed.replaceAll("\\p{M}", "").toLowerCase(Locale.ROOT);
     }
 
+    /**
+     * PDF und alle Ressourcen schließen. Läuft als letzte Aufgabe auf dem Render-Thread, danach ist
+     * dieses Objekt nicht mehr verwendbar (zum erneuten Öffnen ein neues anlegen).
+     */
     public void close() {
         executor.execute(() -> {
             if (renderer != null) renderer.close();
