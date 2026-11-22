@@ -30,7 +30,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
-            <!-- "Teilen -> LearnArchiver" für ein oder mehrere PDFs (z.B. aus HP Smart, E-Mail, Downloads) -->
+            <!-- "Teilen -> Archivo" für ein oder mehrere PDFs (z.B. aus HP Smart, E-Mail, Downloads) -->
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
                 <category android:name="android.intent.category.DEFAULT" />

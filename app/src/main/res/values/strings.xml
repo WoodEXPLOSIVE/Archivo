@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Learn Archiver</string>
+    <string name="app_name">Archivo</string>
     <string name="categories">Kategorie</string>
     <string name="select_file">Datei Wählen</string>
     <string name="drawer_open">Öffnen</string>
@@ -128,7 +128,7 @@
     <string name="scan_error_no_jpeg">Dieser Scanner liefert kein unterstütztes Bildformat.</string>
     <string name="scan_error_generic">Beim Scannen ist ein Fehler aufgetreten.</string>
 
-    <!-- Teilen -> LearnArchiver -->
+    <!-- Teilen -> Archivo -->
     <plurals name="share_import_title">
         <item quantity="one">%d PDF speichern in</item>
         <item quantity="other">%d PDFs speichern in</item>

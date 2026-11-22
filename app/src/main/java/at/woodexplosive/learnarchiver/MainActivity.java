@@ -308,7 +308,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // =====================================================================
-    // Teilen -> LearnArchiver
+    // Teilen -> Archivo
     // =====================================================================
 
     @Override
