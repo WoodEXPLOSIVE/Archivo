@@ -237,21 +237,48 @@ public class PdfViewerFragment extends Fragment {
     }
 
     /**
-     * Die Seite in der Mitte des Bildschirms – das ist die, die man gerade ansieht.
-     * (Die erste sichtbare Seite ist oft nur noch ein Rest der vorherigen.)
+     * Die Seite, die man gerade ansieht. Maßgeblich ist eine "Leselinie", die mit dem Scrollfortschritt
+     * wandert: ganz oben im Dokument am oberen Rand, ganz unten am unteren Rand, dazwischen ungefähr in der
+     * Mitte. So ist jede Seite erreichbar – auch eine niedrige (quer gedrehte) letzte Seite, die nie bis
+     * zur Bildschirmmitte scrollen kann. Mit einer festen Mittellinie würde dort die vorletzte gedreht.
      */
     private int pageAtCenter() {
-        LinearLayoutManager lm = (LinearLayoutManager) binding.pages.getLayoutManager();
+        RecyclerView rv = binding.pages;
+        LinearLayoutManager lm = (LinearLayoutManager) rv.getLayoutManager();
         if (lm == null) return 0;
-        int center = binding.pages.getHeight() / 2;
         int first = lm.findFirstVisibleItemPosition();
         int last = lm.findLastVisibleItemPosition();
         if (first == RecyclerView.NO_POSITION) return 0;
+
+        float progress;   // 0 = ganz oben, 1 = ganz unten
+        if (!rv.canScrollVertically(1)) {
+            progress = rv.canScrollVertically(-1) ? 1f : 0.5f;   // passt alles auf den Schirm → Mitte
+        } else if (!rv.canScrollVertically(-1)) {
+            progress = 0f;
+        } else {
+            int max = rv.computeVerticalScrollRange() - rv.computeVerticalScrollExtent();
+            progress = max > 0 ? Math.min(1f, Math.max(0f, rv.computeVerticalScrollOffset() / (float) max)) : 0.5f;
+        }
+        int top = rv.getPaddingTop();
+        int bottom = rv.getHeight() - rv.getPaddingBottom();
+        int line = Math.min(bottom - 1, Math.round(top + progress * (bottom - top)));
+
+        int best = first;
+        int bestDistance = Integer.MAX_VALUE;
         for (int i = first; i <= last; i++) {
             View v = lm.findViewByPosition(i);
-            if (v != null && lm.getDecoratedTop(v) <= center && lm.getDecoratedBottom(v) > center) return i;
+            if (v == null) continue;
+            int t = lm.getDecoratedTop(v);
+            int b = lm.getDecoratedBottom(v);
+            if (t <= line && b > line) return i;
+            // Linie liegt im Abstand zwischen zwei Seiten → die nächstgelegene nehmen
+            int d = line < t ? t - line : line - b;
+            if (d < bestDistance) {
+                bestDistance = d;
+                best = i;
+            }
         }
-        return first;
+        return best;
     }
 
     /**
@@ -466,6 +493,7 @@ public class PdfViewerFragment extends Fragment {
         int target = hitPages.get(next);
         if (target >= adapter.getItemCount()) return;
         hitIndex = next;
+        rotatedPage = target;   // die angesprungene Trefferseite ist jetzt die aktuelle (auch fürs Drehen)
         LinearLayoutManager lm = (LinearLayoutManager) binding.pages.getLayoutManager();
         if (lm != null) lm.scrollToPositionWithOffset(target, 0);
         // scrollToPosition löst onScrolled erst nach dem nächsten Layout aus
