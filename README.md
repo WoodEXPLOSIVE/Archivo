@@ -1,5 +1,7 @@
 # Archivo
 
+**Deutsch** · [English](README.en.md)
+
 Android-App zum Archivieren, Durchsuchen und Lesen von PDFs: Lernunterlagen, Briefe, Formulare und alles,
 was sonst als Papier herumliegt. Dokumente landen in selbst angelegten Kategorien und Unterkategorien
 (z.B. *Schule → Mathe → Analysis*) und lassen sich über ihren **Inhalt** wiederfinden, auch eingescannte Seiten.
