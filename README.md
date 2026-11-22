@@ -93,7 +93,7 @@ language can also be set per app (Settings → Apps → Archivo → Language).
 - When importing via "Share", only files from other apps are accepted, and they are checked to be real PDFs.
 
 ## Disclaimer
-Claude code was used for Documentation in the code and planning some more complex features.
+Claude code was used for Documentation in the code and planning of some more complex features.
 
 ## License
 

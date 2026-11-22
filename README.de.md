@@ -93,7 +93,7 @@ Sprache auch pro App einstellen (Einstellungen → Apps → Archivo → Sprache)
 - Beim Import über „Teilen“ werden nur Dateien fremder Apps angenommen und auf echtes PDF geprüft.
 
 ## Disclaimer
-Claude code wurde genutzt für Documentation und das plannen von complexeren Features.
+Claude code wurde genutzt für Documentation und das Planen von komplexeren Features.
 
 ## Lizenz
 
