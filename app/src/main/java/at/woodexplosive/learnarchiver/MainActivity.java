@@ -424,8 +424,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void saveCameraScan(long categoryId, Uri pdfUri, int pageCount) {
-        String now = new java.text.SimpleDateFormat("dd.MM.yyyy HH:mm", java.util.Locale.GERMANY)
-                .format(new java.util.Date());
+        String now = ScanFragment.formatScanDate();
         String name = getString(R.string.scan_default_name, now);
         if ("file".equals(pdfUri.getScheme()) && pdfUri.getPath() != null) {
             viewModel.saveScan(categoryId, name, new java.io.File(pdfUri.getPath()), ok -> {

@@ -47,6 +47,16 @@ public class ScanFragment extends Fragment {
     public static final String ARG_CATEGORY_ID = "categoryId";
     public static final String ARG_CATEGORY_NAME = "categoryName";
 
+    /**
+     * Datum + Uhrzeit für den Standardnamen eines Scans im Format der Gerätesprache
+     * (Deutsch "22.11.2026, 14:30", Englisch z.B. "11/22/2026, 2:30 PM").
+     */
+    public static String formatScanDate() {
+        Locale locale = Locale.getDefault();
+        String pattern = android.text.format.DateFormat.getBestDateTimePattern(locale, "ddMMyyyyHHmm");
+        return new SimpleDateFormat(pattern, locale).format(new Date());
+    }
+
     /** Ab Android 17 braucht Zugriff aufs Heimnetz eine Laufzeit-Berechtigung */
     private static final int API_LOCAL_NETWORK_PERMISSION = 37;
 
@@ -87,8 +97,7 @@ public class ScanFragment extends Fragment {
         libraryVm = new ViewModelProvider(requireActivity()).get(LibraryViewModel.class);
 
         if (savedInstanceState == null) {
-            String now = new SimpleDateFormat("dd.MM.yyyy HH:mm", Locale.GERMANY).format(new Date());
-            binding.nameInput.setText(getString(R.string.scan_default_name, now));
+            binding.nameInput.setText(getString(R.string.scan_default_name, formatScanDate()));
         }
 
         startDiscoveryWithPermission();

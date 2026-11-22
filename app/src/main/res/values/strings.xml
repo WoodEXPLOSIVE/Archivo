@@ -1,151 +1,158 @@
 <resources>
-    <string name="app_name">Archivo</string>
-    <string name="categories">Kategorie</string>
-    <string name="select_file">Datei Wählen</string>
-    <string name="drawer_open">Öffnen</string>
-    <string name="drawer_close">Schließen</string>
-    <string name="new_category">Neue Kategorie</string>
-    <string name="new_subcategory">Neue Unterkategorie</string>
-    <string name="rename">Umbennenen</string>
-    <string name="delete">Löschen</string>
-    <string name="cancel">Abbrechen</string>
-    <string name="save">Speichern</string>
-    <string name="move">Verschieben</string>
+    <!-- Standardsprache Englisch. Deutsch: values-de/strings.xml – neue Texte immer in BEIDEN Dateien anlegen. -->
+    <string name="app_name" translatable="false">Archivo</string>
+    <string name="categories">Categories</string>
+    <string name="select_file">Choose file</string>
+    <string name="drawer_open">Open</string>
+    <string name="drawer_close">Close</string>
+    <string name="new_category">New category</string>
+    <string name="new_subcategory">New subcategory</string>
+    <string name="rename">Rename</string>
+    <string name="delete">Delete</string>
+    <string name="cancel">Cancel</string>
+    <string name="save">Save</string>
+    <string name="move">Move</string>
     <string name="name_hint">Name…</string>
-    <string name="delete_category_title">Kategorie Löschen?</string>
-    <string name="delete_category_message">"%1$s" wird mit allen Unterkategorien und PDFs gelöscht.</string>
-    <string name="delete_pdf_title">PDF löschen?</string>
-    <string name="delete_pdf_message">"%1$s" wird gelöscht.</string>
-    <string name="import_pdf">PDF importieren</string>
+    <string name="delete_category_title">Delete category?</string>
+    <string name="delete_category_message">"%1$s" will be deleted along with all its subcategories and PDFs.</string>
+    <string name="delete_pdf_title">Delete PDF?</string>
+    <string name="delete_pdf_message">"%1$s" will be deleted.</string>
+    <string name="import_pdf">Import PDF</string>
+    <!-- Ersatznamen, wenn eine Datei keinen (gültigen) Namen hat -->
+    <string name="unknown_name">Unknown</string>
+    <string name="default_document_name">Document</string>
     <plurals name="pdfs_imported">
-        <item quantity="one">%d PDF importiert</item>
-        <item quantity="other">%d PDFs importiert</item>
+        <item quantity="one">%d PDF imported</item>
+        <item quantity="other">%d PDFs imported</item>
     </plurals>
     <plurals name="pdfs_failed">
-        <item quantity="one">%d Datei konnte nicht importiert werden</item>
-        <item quantity="other">%d Dateien konnten nicht importiert werden</item>
+        <item quantity="one">%d file could not be imported</item>
+        <item quantity="other">%d files could not be imported</item>
     </plurals>
-    <string name="pdf_open_failed">PDF konnte nicht geöffnet werden</string>
-    <string name="viewer_pdf_deleted">Das geöffnete PDF wurde gelöscht</string>
-    <string name="viewer_prev_hit">Vorheriger Treffer</string>
-    <string name="viewer_rotate_page">Diese Seite drehen</string>
-    <string name="viewer_rotate_all">Alle Seiten drehen</string>
-    <string name="viewer_rotate_protected">Dieses PDF ist geschützt und kann nicht geändert werden</string>
-    <string name="viewer_rotate_failed">Drehen fehlgeschlagen</string>
-    <string name="viewer_next_hit">Nächster Treffer</string>
-    <!-- %1$d = Nummer des Treffers, %2$d = Anzahl, %3$d = Seite -->
-    <string name="viewer_hit_label">Trefferseite %1$d von %2$d · S. %3$d</string>
-    <string name="viewer_hit_label_between">%1$d Trefferseiten</string>
-    <string name="move_pdf_title">"%1$s" verschieben nach</string>
-    <string name="move_category_title">"%1$s" verschieben nach</string>
-    <string name="top_level">Oberste Ebene</string>
-    <string name="select">Auswählen</string>
-    <string name="select_all">Alle auswählen</string>
-    <string name="close_selection">Auswahl beenden</string>
+    <string name="pdf_open_failed">PDF could not be opened</string>
+    <string name="viewer_pdf_deleted">The open PDF was deleted</string>
+    <string name="viewer_prev_hit">Previous match</string>
+    <string name="viewer_rotate_page">Rotate this page</string>
+    <string name="viewer_rotate_all">Rotate all pages</string>
+    <string name="viewer_rotate_protected">This PDF is protected and cannot be changed</string>
+    <string name="viewer_rotate_failed">Rotating failed</string>
+    <string name="viewer_next_hit">Next match</string>
+    <!-- %1$d = number of the match, %2$d = count, %3$d = page -->
+    <string name="viewer_hit_label">Match page %1$d of %2$d · p. %3$d</string>
+    <plurals name="viewer_hit_label_between">
+        <item quantity="one">%d match page</item>
+        <item quantity="other">%d match pages</item>
+    </plurals>
+    <string name="move_pdf_title">Move "%1$s" to</string>
+    <string name="move_category_title">Move "%1$s" to</string>
+    <string name="top_level">Top level</string>
+    <string name="select">Select</string>
+    <string name="select_all">Select all</string>
+    <string name="close_selection">End selection</string>
     <plurals name="selected_count">
-        <item quantity="one">%d ausgewählt</item>
-        <item quantity="other">%d ausgewählt</item>
+        <item quantity="one">%d selected</item>
+        <item quantity="other">%d selected</item>
     </plurals>
     <plurals name="move_selection_title">
-        <item quantity="one">%d Element verschieben nach</item>
-        <item quantity="other">%d Elemente verschieben nach</item>
+        <item quantity="one">Move %d item to</item>
+        <item quantity="other">Move %d items to</item>
     </plurals>
-    <string name="delete_selection_title">Auswahl löschen?</string>
+    <string name="delete_selection_title">Delete selection?</string>
     <plurals name="delete_selection_message">
-        <item quantity="one">%d Element wird gelöscht. Ausgewählte Kategorien werden mit allen Unterkategorien und PDFs gelöscht.</item>
-        <item quantity="other">%d Elemente werden gelöscht. Ausgewählte Kategorien werden mit allen Unterkategorien und PDFs gelöscht.</item>
+        <item quantity="one">%d item will be deleted. Selected categories are deleted along with all their subcategories and PDFs.</item>
+        <item quantity="other">%d items will be deleted. Selected categories are deleted along with all their subcategories and PDFs.</item>
     </plurals>
-    <string name="search_hint">Suchen…</string>
-    <string name="search_in_content">Im PDF-Inhalt suchen</string>
-    <string name="search_no_results">Keine Treffer</string>
-    <string name="search_hit_page">S. %1$s: %2$s</string>
+    <string name="search_hint">Search…</string>
+    <string name="search_in_content">Search PDF content</string>
+    <string name="search_no_results">No matches</string>
+    <string name="search_hit_page">p. %1$s: %2$s</string>
     <plurals name="search_indexing_pending">
-        <item quantity="one">Inhalt von %d PDF wird noch ausgelesen…</item>
-        <item quantity="other">Inhalte von %d PDFs werden noch ausgelesen…</item>
+        <item quantity="one">Still reading the content of %d PDF…</item>
+        <item quantity="other">Still reading the content of %d PDFs…</item>
     </plurals>
-    <string name="viewer_highlight_subtitle">Treffer für „%1$s“</string>
-    <!-- Scannen -->
-    <string name="scan">Mit Drucker scannen</string>
-    <string name="scan_title">Scannen</string>
-    <string name="scan_target">Wird gespeichert in: %1$s</string>
+    <string name="viewer_highlight_subtitle">Matches for “%1$s”</string>
+    <!-- Scanning -->
+    <string name="scan">Scan with printer</string>
+    <string name="scan_title">Scan</string>
+    <string name="scan_target">Saving to: %1$s</string>
     <string name="scan_section_scanner">Scanner</string>
-    <string name="scan_section_source">Quelle</string>
-    <string name="scan_section_color">Farbe</string>
-    <string name="scan_section_resolution">Auflösung</string>
-    <string name="scan_searching">Suche Scanner im WLAN…</string>
-    <string name="scan_found_hint">Drucker muss eingeschaltet und im selben WLAN sein.</string>
-    <string name="scan_manual_ip">Nicht gefunden? IP-Adresse eingeben</string>
-    <string name="scan_manual_ip_title">IP-Adresse des Druckers</string>
-    <string name="scan_permission_denied">Ohne Zugriff auf das lokale Netzwerk kann kein Scanner gefunden werden.</string>
-    <string name="scan_source_platen">Scannerglas</string>
-    <string name="scan_source_feeder">Einzug</string>
-    <string name="scan_duplex">Beidseitig scannen (Vorder- und Rückseite)</string>
-    <string name="scan_remove_blank">Leere Rückseiten entfernen</string>
+    <string name="scan_section_source">Source</string>
+    <string name="scan_section_color">Color</string>
+    <string name="scan_section_resolution">Resolution</string>
+    <string name="scan_searching">Searching for scanners on Wi-Fi…</string>
+    <string name="scan_found_hint">The printer must be switched on and on the same Wi-Fi.</string>
+    <string name="scan_manual_ip">Not found? Enter IP address</string>
+    <string name="scan_manual_ip_title">Printer IP address</string>
+    <string name="scan_permission_denied">Without access to the local network no scanner can be found.</string>
+    <string name="scan_source_platen">Flatbed</string>
+    <string name="scan_source_feeder">Document feeder</string>
+    <string name="scan_duplex">Scan both sides (front and back)</string>
+    <string name="scan_remove_blank">Remove blank back pages</string>
     <plurals name="scan_status_blank_removed">
-        <item quantity="one">%d leere Rückseite entfernt.</item>
-        <item quantity="other">%d leere Rückseiten entfernt.</item>
+        <item quantity="one">%d blank back page removed.</item>
+        <item quantity="other">%d blank back pages removed.</item>
     </plurals>
-    <string name="scan_color_rgb">Farbe</string>
-    <string name="scan_color_gray">Graustufen</string>
-    <string name="scan_dpi_150">150 dpi</string>
-    <string name="scan_dpi_200">200 dpi</string>
-    <string name="scan_dpi_300">300 dpi</string>
-    <string name="scan_name_hint">Name des Dokuments</string>
+    <string name="scan_color_rgb">Color</string>
+    <string name="scan_color_gray">Grayscale</string>
+    <string name="scan_dpi_150" translatable="false">150 dpi</string>
+    <string name="scan_dpi_200" translatable="false">200 dpi</string>
+    <string name="scan_dpi_300" translatable="false">300 dpi</string>
+    <string name="scan_name_hint">Document name</string>
     <string name="scan_default_name">Scan %1$s</string>
-    <string name="scan_button">Scannen</string>
-    <string name="scan_discard">Verwerfen</string>
-    <string name="scan_section_preview">Gescannte Seiten</string>
-    <string name="scan_preview_hint">Antippen zum Vergrößern, gedrückt halten und ziehen zum Umsortieren</string>
-    <string name="scan_preview_page">Gescannte Seite</string>
-    <string name="scan_preview_delete">Seite entfernen</string>
-    <string name="scan_preview_rotate">Seite drehen</string>
-    <string name="scan_preview_rotate_button">Drehen</string>
-    <string name="scan_preview_title">Seite %1$d von %2$d</string>
-    <string name="scan_preview_remove">Entfernen</string>
-    <string name="close">Schließen</string>
-    <string name="scan_finish">Speichern</string>
+    <string name="scan_button">Scan</string>
+    <string name="scan_discard">Discard</string>
+    <string name="scan_section_preview">Scanned pages</string>
+    <string name="scan_preview_hint">Tap to enlarge, press and drag to reorder</string>
+    <string name="scan_preview_page">Scanned page</string>
+    <string name="scan_preview_delete">Remove page</string>
+    <string name="scan_preview_rotate">Rotate page</string>
+    <string name="scan_preview_rotate_button">Rotate</string>
+    <string name="scan_preview_title">Page %1$d of %2$d</string>
+    <string name="scan_preview_remove">Remove</string>
+    <string name="close">Close</string>
+    <string name="scan_finish">Save</string>
     <plurals name="scan_finish_pages">
-        <item quantity="one">%d Seite speichern</item>
-        <item quantity="other">%d Seiten speichern</item>
+        <item quantity="one">Save %d page</item>
+        <item quantity="other">Save %d pages</item>
     </plurals>
-    <string name="scan_status_connecting">Verbinde mit %1$s…</string>
-    <string name="scan_status_ready">Bereit. Papier einlegen und \"Scannen\" tippen.</string>
-    <string name="scan_status_scanning">Scanne…</string>
-    <string name="scan_status_page_received">Seite %1$d empfangen…</string>
-    <string name="scan_status_cancelled">Scan abgebrochen</string>
-    <string name="scan_status_saving">PDF wird erstellt…</string>
+    <string name="scan_status_connecting">Connecting to %1$s…</string>
+    <string name="scan_status_ready">Ready. Insert paper and tap \"Scan\".</string>
+    <string name="scan_status_scanning">Scanning…</string>
+    <string name="scan_status_page_received">Page %1$d received…</string>
+    <string name="scan_status_cancelled">Scan cancelled</string>
+    <string name="scan_status_saving">Creating PDF…</string>
     <plurals name="scan_status_pages">
-        <item quantity="one">%d Seite gescannt. Weitere Seite scannen oder speichern.</item>
-        <item quantity="other">%d Seiten gescannt. Weitere Seiten scannen oder speichern.</item>
+        <item quantity="one">%d page scanned. Scan another page or save.</item>
+        <item quantity="other">%d pages scanned. Scan more pages or save.</item>
     </plurals>
     <plurals name="scan_saved">
-        <item quantity="one">Scan gespeichert (%d Seite)</item>
-        <item quantity="other">Scan gespeichert (%d Seiten)</item>
+        <item quantity="one">Scan saved (%d page)</item>
+        <item quantity="other">Scan saved (%d pages)</item>
     </plurals>
-    <string name="scan_error_connect">%1$s antwortet nicht. Ist der Drucker eingeschaltet und im selben WLAN?</string>
-    <string name="scan_error_adf_empty">Kein Papier im Einzug.</string>
-    <string name="scan_error_busy">Der Scanner ist gerade beschäftigt. Bitte kurz warten und erneut versuchen.</string>
-    <string name="scan_error_no_jpeg">Dieser Scanner liefert kein unterstütztes Bildformat.</string>
-    <string name="scan_error_generic">Beim Scannen ist ein Fehler aufgetreten.</string>
+    <string name="scan_error_connect">%1$s is not responding. Is the printer switched on and on the same Wi-Fi?</string>
+    <string name="scan_error_adf_empty">No paper in the document feeder.</string>
+    <string name="scan_error_busy">The scanner is busy. Please wait a moment and try again.</string>
+    <string name="scan_error_no_jpeg">This scanner does not deliver a supported image format.</string>
+    <string name="scan_error_generic">An error occurred while scanning.</string>
 
-    <!-- Teilen -> Archivo -->
+    <!-- Share -> Archivo -->
     <plurals name="share_import_title">
-        <item quantity="one">%d PDF speichern in</item>
-        <item quantity="other">%d PDFs speichern in</item>
+        <item quantity="one">Save %d PDF to</item>
+        <item quantity="other">Save %d PDFs to</item>
     </plurals>
-    <string name="share_new_category">+ Neue Kategorie…</string>
-    <string name="share_no_pdf">Keine PDF-Datei empfangen.</string>
-    <!-- PDFs teilen -->
-    <string name="share">Teilen</string>
+    <string name="share_new_category">+ New category…</string>
+    <string name="share_no_pdf">No PDF file received.</string>
+    <!-- Sharing PDFs -->
+    <string name="share">Share</string>
     <plurals name="share_chooser_title">
-        <item quantity="one">PDF teilen</item>
-        <item quantity="other">%d PDFs teilen</item>
+        <item quantity="one">Share PDF</item>
+        <item quantity="other">Share %d PDFs</item>
     </plurals>
-    <string name="share_nothing">Keine PDFs zum Teilen ausgewählt.</string>
-    <string name="share_failed">PDF konnte nicht zum Teilen vorbereitet werden.</string>
+    <string name="share_nothing">No PDFs selected to share.</string>
+    <string name="share_failed">PDF could not be prepared for sharing.</string>
 
-    <!-- Kamera-Scan -->
-    <string name="scan_camera">Mit Kamera scannen</string>
-    <string name="scan_camera_unavailable">Kamera-Scanner nicht verfügbar (Google Play-Dienste nötig).</string>
-    <string name="scan_camera_choose_category">Scan speichern in</string>
+    <!-- Camera scan -->
+    <string name="scan_camera">Scan with camera</string>
+    <string name="scan_camera_unavailable">Camera scanner not available (requires Google Play services).</string>
+    <string name="scan_camera_choose_category">Save scan to</string>
 </resources>

@@ -30,6 +30,7 @@ import com.tom_roush.pdfbox.android.PDFBoxResourceLoader;
 import com.tom_roush.pdfbox.pdmodel.PDDocument;
 import com.tom_roush.pdfbox.pdmodel.PDPage;
 
+import at.woodexplosive.learnarchiver.R;
 import at.woodexplosive.learnarchiver.data.dao.CategoryDao;
 import at.woodexplosive.learnarchiver.data.dao.ContentHit;
 import at.woodexplosive.learnarchiver.data.dao.PdfFileDao;
@@ -221,9 +222,9 @@ public class LibraryRepository {
     }
 
     /** Zeichen entfernen, die in Dateinamen verboten sind */
-    private static String safeFileName(String name) {
+    private String safeFileName(String name) {
         String s = name.replaceAll("[\\\\/:*?\"<>|]", "_").trim();
-        return s.isEmpty() ? "Dokument" : s;
+        return s.isEmpty() ? appContext.getString(R.string.default_document_name) : s;
     }
 
     // ---------- Volltextsuche ----------
@@ -467,7 +468,7 @@ public class LibraryRepository {
             Log.w("LibraryRepository", "Dateiname nicht lesbar: " + uri, e);   // Name ist optional
         }
         if (name == null || name.trim().isEmpty()) {
-            name = "Unbekannt";
+            name = appContext.getString(R.string.unknown_name);
         }
         if (name.toLowerCase(Locale.ROOT).endsWith(".pdf")) {
             name = name.substring(0, name.length() - 4);

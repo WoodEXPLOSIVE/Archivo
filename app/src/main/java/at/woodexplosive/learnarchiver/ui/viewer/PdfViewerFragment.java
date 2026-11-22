@@ -554,7 +554,7 @@ public class PdfViewerFragment extends Fragment {
         int index = hitIndex >= 0 ? hitIndex : hitPages.indexOf(currentPage());
         binding.hitLabel.setText(index >= 0
                 ? getString(R.string.viewer_hit_label, index + 1, hitPages.size(), hitPages.get(index) + 1)
-                : getString(R.string.viewer_hit_label_between, hitPages.size()));
+                : getResources().getQuantityString(R.plurals.viewer_hit_label_between, hitPages.size(), hitPages.size()));
     }
 
     @Override
