@@ -94,3 +94,14 @@ Sprache auch pro App einstellen (Einstellungen → Apps → Archivo → Sprache)
 
 ## Disclaimer
 Claude code wurde genutzt für Documentation und das plannen von complexeren Features.
+
+## Lizenz
+
+© 2026 WoodEXPLOSIVE. Lizenziert unter [CC BY-NC-ND 4.0](LICENSE.txt):
+
+- **Teilen** – App und Code dürfen kopiert und weitergegeben werden.
+- **Namensnennung** – WoodEXPLOSIVE muss genannt und auf diese Lizenz verwiesen werden.
+- **Nicht kommerziell** – keine kommerzielle Nutzung.
+- **Keine Bearbeitungen** – veränderte Versionen dürfen nicht weitergegeben werden.
+
+Fremde Bibliotheken behalten ihre eigenen Lizenzen (z.B. PdfBox-Android: Apache-Lizenz 2.0).
