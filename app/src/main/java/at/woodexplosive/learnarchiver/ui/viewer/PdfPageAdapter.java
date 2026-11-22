@@ -32,6 +32,21 @@ public class PdfPageAdapter extends RecyclerView.Adapter<PdfPageAdapter.PageHold
         notifyDataSetChanged();
     }
 
+    /** Angezeigte Seitenbreite in Pixeln (Bildschirm × Zoom, ohne Padding) */
+    public int getPageWidth() {
+        return pageWidth;
+    }
+
+    /** Höhe / Breite der Seite */
+    public float getAspectRatio(int position) {
+        return aspectRatios.get(position);
+    }
+
+    /** Breite, in der die Seiten gerendert werden (begrenzt wegen Speicher) */
+    public int getRenderWidth() {
+        return Math.min(pageWidth, maxRenderWidth);
+    }
+
     public void setPageWidth(int pageWidth) {
         this.pageWidth = pageWidth;
         notifyDataSetChanged();
@@ -52,7 +67,7 @@ public class PdfPageAdapter extends RecyclerView.Adapter<PdfPageAdapter.PageHold
         holder.b.page.setLayoutParams(lp);
 
         holder.boundPage = position;
-        int renderWidth = Math.min(pageWidth, maxRenderWidth);
+        int renderWidth = getRenderWidth();
         Bitmap cached = renderer.getChached(position);
         if (cached != null) {
             holder.b.page.setImageBitmap(cached);

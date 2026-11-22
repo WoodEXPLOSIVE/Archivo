@@ -1,5 +1,6 @@
 package at.woodexplosive.learnarchiver.ui.viewer;
 
+import android.graphics.RectF;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -66,6 +67,8 @@ public class PdfViewerFragment extends Fragment {
      * trifft so immer dieselbe Seite – auch die letzte, die sich nicht bis in die Mitte scrollen lässt.
      */
     private int rotatedPage = -1;
+    /** Seite, auf der nach einem Sprung noch zum Treffer-Wort gescrollt werden soll (-1 = keine) */
+    private int revealPage = -1;
 
     @Nullable
     @Override
@@ -173,6 +176,7 @@ public class PdfViewerFragment extends Fragment {
                 // Wie ein normales Scrollen durch den User: gemerkte Treffer-/Dreh-Seite vergessen
                 hitIndex = -1;
                 rotatedPage = -1;
+                revealPage = -1;
                 restX = restY = 0f;
                 binding.pages.stopScroll();
             }
@@ -395,6 +399,7 @@ public class PdfViewerFragment extends Fragment {
             adapter.setPages(aspectRatios, pageWidth);
             LinearLayoutManager lm = (LinearLayoutManager) binding.pages.getLayoutManager();
             if (lm != null) lm.scrollToPositionWithOffset(page, -Math.round(pageOffset * pageWidth));
+            if (startPage >= 0) revealHit(page);   // aus der Suche: gleich zum Wort
 
             float sx = scrollX;
             binding.hScroll.post(() -> {
@@ -443,7 +448,10 @@ public class PdfViewerFragment extends Fragment {
         binding.pages.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrollStateChanged(@NonNull RecyclerView rv, int newState) {
-                if (newState == RecyclerView.SCROLL_STATE_DRAGGING) hitIndex = -1;   // User scrollt selbst
+                if (newState == RecyclerView.SCROLL_STATE_DRAGGING) {   // User scrollt selbst
+                    hitIndex = -1;
+                    revealPage = -1;
+                }
             }
 
             @Override
@@ -498,6 +506,46 @@ public class PdfViewerFragment extends Fragment {
         if (lm != null) lm.scrollToPositionWithOffset(target, 0);
         // scrollToPosition löst onScrolled erst nach dem nächsten Layout aus
         binding.pages.post(this::updateHitLabel);
+        revealHit(target);
+    }
+
+    /**
+     * Nach dem Sprung auf eine Trefferseite zum (obersten) markierten Wort scrollen – senkrecht und, wenn
+     * eingezoomt, auch waagrecht. Wichtig im Quermodus/eingezoomt: Dort ist eine Seite viel höher als der
+     * Bildschirm, oben auf der Seite sähe man das Wort oft gar nicht.
+     * Die Positionen kommen vom Renderer (bei Bedarf wird die Seite dafür erst gerendert).
+     */
+    private void revealHit(int page) {
+        if (renderer == null || adapter == null) return;
+        revealPage = page;
+        PdfDocumentRenderer forRenderer = renderer;
+        renderer.findHits(page, adapter.getRenderWidth(), (index, rects) -> {
+            // Inzwischen selbst gescrollt, weitergesprungen oder neu geöffnet (Drehen) → nichts tun
+            if (binding == null || renderer != forRenderer || revealPage != index || rects.isEmpty()) return;
+            revealPage = -1;
+
+            RectF hit = rects.get(0);   // oberster Treffer (bei gleicher Höhe der linke)
+            for (RectF r : rects) {
+                if (r.top < hit.top - 0.005f || (Math.abs(r.top - hit.top) <= 0.005f && r.left < hit.left)) hit = r;
+            }
+            RecyclerView rv = binding.pages;
+            LinearLayoutManager lm = (LinearLayoutManager) rv.getLayoutManager();
+            if (lm == null || index >= adapter.getItemCount()) return;
+
+            int pageWidth = adapter.getPageWidth();
+            int pageHeight = Math.round(pageWidth * adapter.getAspectRatio(index));
+            int viewport = rv.getHeight() - rv.getPaddingTop() - rv.getPaddingBottom();
+            // Wort etwa ins obere Drittel (darunter liegt die Trefferleiste); liegt es schon weit oben
+            // auf der Seite, bleibt der Seitenanfang sichtbar (Offset nie > 0)
+            int wordY = Math.round(hit.centerY() * pageHeight);
+            int offset = Math.min(0, viewport / 3 - wordY);
+            lm.scrollToPositionWithOffset(index, offset);
+
+            // Waagrecht: nur relevant, wenn eingezoomt (sonst kann hScroll nicht scrollen → scrollTo begrenzt)
+            int wordX = rv.getPaddingLeft() + Math.round(hit.centerX() * pageWidth);
+            binding.hScroll.scrollTo(Math.max(0, wordX - binding.hScroll.getWidth() / 2), 0);
+            rv.post(this::updateHitLabel);
+        });
     }
 
     /** "Trefferseite 2 von 5 · S. 7", oder "5 Trefferseiten", wenn die aktuelle Seite keine ist */

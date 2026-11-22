@@ -76,6 +76,8 @@ public class PdfDocumentRenderer {
     private boolean pdfBoxFailed;
     /** Ursprüngliche Drehung je Seite – im PdfBox-Dokument wird sie zum Auslesen auf 0 gesetzt */
     private final java.util.Map<Integer, Integer> originalRotation = new java.util.HashMap<>();
+    /** Gefundene Treffer je Seite (Anteil der Seite 0..1). Nur auf dem executor benutzen. */
+    private final java.util.Map<Integer, List<RectF>> hitRects = new java.util.HashMap<>();
 
     public PdfDocumentRenderer() {
         int maxKb = (int) (Runtime.getRuntime().maxMemory() / 1024);
@@ -131,24 +133,50 @@ public class PdfDocumentRenderer {
     public void render(int index, int width, RenderCallback callback) {
         executor.execute(() -> {
             if (renderer == null) return;
-
-            Bitmap bitmap = getChached(index);
-            if (bitmap == null || bitmap.getWidth() != width) {
-                try (PdfRenderer.Page page = renderer.openPage(index)) {
-                    int height = Math.round(width * (float) page.getHeight() / page.getWidth());
-                    bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-                    bitmap.eraseColor(Color.WHITE);
-                    page.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY);
-
-                    if (!highlightTerms.isEmpty()) {
-                        highlight(page, bitmap);
-                    }
-                }
-                chache.put(index, bitmap);
-            }
-
-            final Bitmap result = bitmap;
+            final Bitmap result = renderOnExecutor(index, width);
             mainHandler.post(() -> callback.onPageRendered(index, result));
+        });
+    }
+
+    /** Seite aus dem Cache oder neu rendern (+ markieren). Nur auf dem executor aufrufen. */
+    private Bitmap renderOnExecutor(int index, int width) {
+        Bitmap bitmap = getChached(index);
+        if (bitmap == null || bitmap.getWidth() != width) {
+            try (PdfRenderer.Page page = renderer.openPage(index)) {
+                int height = Math.round(width * (float) page.getHeight() / page.getWidth());
+                bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+                bitmap.eraseColor(Color.WHITE);
+                page.render(bitmap, null, null, PdfRenderer.Page.RENDER_MODE_FOR_DISPLAY);
+
+                if (!highlightTerms.isEmpty()) {
+                    highlight(index, page, bitmap);
+                }
+            }
+            chache.put(index, bitmap);
+        }
+        return bitmap;
+    }
+
+    public interface HitsCallback {
+        /** @param rects Trefferrechtecke als Anteil der Seite (0..1, wie angezeigt, also inkl. Drehung) */
+        void onHits(int index, List<RectF> rects);
+    }
+
+    /**
+     * Wo liegen die markierten Treffer auf der Seite? Rendert die Seite dafür, falls sie noch nicht
+     * markiert wurde (dieselbe Breite wie der Adapter → landet danach im Cache und wird nicht doppelt gerendert).
+     */
+    public void findHits(int index, int width, HitsCallback callback) {
+        executor.execute(() -> {
+            if (renderer == null || highlightTerms.isEmpty() || width <= 0) return;
+            if (index < 0 || index >= renderer.getPageCount()) return;
+            List<RectF> rects = hitRects.get(index);
+            if (rects == null) {
+                renderOnExecutor(index, width);
+                rects = hitRects.get(index);
+            }
+            final List<RectF> result = rects == null ? Collections.<RectF>emptyList() : new ArrayList<>(rects);
+            mainHandler.post(() -> callback.onHits(index, result));
         });
     }
 
@@ -164,7 +192,7 @@ public class PdfDocumentRenderer {
         return paint;
     }
 
-    private void highlight(PdfRenderer.Page page, Bitmap bitmap) {
+    private void highlight(int index, PdfRenderer.Page page, Bitmap bitmap) {
         try {
             // Ab Android 15: Textebene über PdfRenderer. Davor: PdfBox (null = Seite ohne Text).
             // Scans (keine Textebene) in beiden Fällen per OCR.
@@ -175,6 +203,12 @@ public class PdfDocumentRenderer {
                 rects = findWithPdfBox(page, bitmap);
             }
             if (rects == null) rects = findWithOcr(bitmap);
+
+            // Für "zum Treffer springen" merken – als Anteil der Seite, unabhängig von Zoom/Renderbreite
+            List<RectF> relative = new ArrayList<>(rects.size());
+            float w = bitmap.getWidth(), h = bitmap.getHeight();
+            for (RectF r : rects) relative.add(new RectF(r.left / w, r.top / h, r.right / w, r.bottom / h));
+            hitRects.put(index, relative);
             if (rects.isEmpty()) return;
 
             Canvas canvas = new Canvas(bitmap);
