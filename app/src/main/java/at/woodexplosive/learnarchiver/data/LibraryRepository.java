@@ -1,5 +1,6 @@
 package at.woodexplosive.learnarchiver.data;
 
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -401,17 +402,48 @@ public class LibraryRepository {
         });
     }
 
+    /**
+     * Darf diese Uri importiert werden? Nur content:// von FREMDEN Apps.
+     * Sonst könnte eine andere App per "Teilen" z.B. file:///data/data/<diese App>/databases/… schicken,
+     * und wir würden unsere eigene private Datei in die Bibliothek kopieren (und sie wäre teilbar).
+     */
+    private boolean isImportAllowed(Uri uri) {
+        if (!ContentResolver.SCHEME_CONTENT.equals(uri.getScheme())) return false;
+        String authority = uri.getAuthority();
+        return authority != null && !authority.startsWith(appContext.getPackageName());
+    }
+
+    /** PDF-Kennung "%PDF" muss in den ersten 1024 Bytes stehen (so verlangt es auch die Spezifikation) */
+    private static boolean looksLikePdf(byte[] head, int length) {
+        for (int i = 0; i + 3 < length; i++) {
+            if (head[i] == '%' && head[i + 1] == 'P' && head[i + 2] == 'D' && head[i + 3] == 'F') return true;
+        }
+        return false;
+    }
+
     private boolean importSingle(long categoryId, Uri uri) {
+        if (!isImportAllowed(uri)) {
+            Log.w("LibraryRepository", "Import abgelehnt (keine fremde content://-Uri): " + uri);
+            return false;
+        }
         String fileName = UUID.randomUUID().toString() + ".pdf";
         File target = new File(pdfDir, fileName);
         try (InputStream in = appContext.getContentResolver().openInputStream(uri);
              OutputStream out = new FileOutputStream(target)) {
             if (in == null) throw new IOException("No InputStream for: " + uri);
             byte[] buf = new byte[8192];
+            byte[] head = new byte[1024];
+            int headLen = 0;
             int read;
             while ((read = in.read(buf)) != -1) {
+                if (headLen < head.length) {   // Anfang merken für die PDF-Prüfung
+                    int n = Math.min(read, head.length - headLen);
+                    System.arraycopy(buf, 0, head, headLen, n);
+                    headLen += n;
+                }
                 out.write(buf, 0, read);
             }
+            if (!looksLikePdf(head, headLen)) throw new IOException("Kein PDF: " + uri);
         } catch (IOException | SecurityException e) {
             // SecurityException: keine Leseberechtigung für die Uri (z.B. abgelaufen beim Teilen)
             // → als "fehlgeschlagen" zählen statt die ganze App abstürzen zu lassen

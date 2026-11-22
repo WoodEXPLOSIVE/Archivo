@@ -18,7 +18,12 @@ import com.google.mlkit.vision.text.TextRecognition;
 import com.google.mlkit.vision.text.TextRecognizer;
 import com.google.mlkit.vision.text.latin.TextRecognizerOptions;
 
+import com.tom_roush.pdfbox.io.MemoryUsageSetting;
+import com.tom_roush.pdfbox.pdmodel.PDDocument;
+import com.tom_roush.pdfbox.text.PDFTextStripper;
+
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -34,7 +39,8 @@ import at.woodexplosive.learnarchiver.data.enitity.PdfText;
  * <p>
  * - Text-PDFs: PdfRenderer.Page.getTextContents() (gibt's erst ab Android 15 / API 35)
  * - Eingescannte Seiten (kaum/kein Text): Seite als Bild rendern → ML Kit Texterkennung (OCR)
- * - Vor Android 15 gibt es keine Textebene → JEDE Seite wird per OCR gelesen (langsamer, aber geht überall)
+ * - Vor Android 15 liest PdfBox die Textebene (exakt + schnell). Liefert PdfBox nichts Brauchbares
+ *   (Scan oder Zeichensalat durch eigene Schriftkodierung), übernimmt ebenfalls die OCR.
  * <p>
  * Läuft auf einem EIGENEN Thread, damit lange OCR-Läufe die normalen DB-Aktionen
  * (dbExecutor) nicht blockieren. Fortschritt im Logcat unter "PdfIndexer".
@@ -95,17 +101,26 @@ public class PdfIndexer {
         long start = SystemClock.elapsedRealtime();
         List<PdfText> pages = new ArrayList<>();
         int ocrPages = 0;
+        int pdfBoxPages = 0;
         int pageCount;
 
         File file = new File(pdfDir, pdf.filePath);
+        // Vor Android 15: Textebene per PdfBox (null = ließ sich nicht laden → alles per OCR)
+        PDDocument pdfBoxDoc = hasTextLayerApi() ? null : openWithPdfBox(file);
+        PDFTextStripper stripper = null;
         try (ParcelFileDescriptor fd = ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY);
              PdfRenderer renderer = new PdfRenderer(fd)) {
             pageCount = renderer.getPageCount();
+            if (pdfBoxDoc != null) stripper = new PDFTextStripper();
             for (int i = 0; i < pageCount; i++) {
                 String text;
                 try (PdfRenderer.Page page = renderer.openPage(i)) {
-                    // Ohne Textebene (vor Android 15) bleibt das leer → OCR übernimmt unten
-                    text = hasTextLayerApi() ? extractText(page) : "";
+                    if (hasTextLayerApi()) {
+                        text = extractText(page);
+                    } else {
+                        text = extractWithPdfBox(pdfBoxDoc, stripper, i);
+                        if (text.trim().length() >= MIN_TEXT_CHARS) pdfBoxPages++;
+                    }
                     if (text.trim().length() < MIN_TEXT_CHARS) {
                         String ocr = recognize(page, recognizer);
                         if (ocr.trim().length() > text.trim().length()) {
@@ -126,6 +141,8 @@ public class PdfIndexer {
             Log.w(TAG, "Indizieren fehlgeschlagen: " + pdf.displayName, e);
             pdfFileDao.setIndexState(pdf.id, PdfFile.INDEX_FAILED);
             return;
+        } finally {
+            closeQuietly(pdfBoxDoc);
         }
 
         db.runInTransaction(() -> {
@@ -135,7 +152,66 @@ public class PdfIndexer {
         });
 
         Log.i(TAG, "Indiziert: " + pdf.displayName + " – " + pageCount + " Seiten, davon "
-                + ocrPages + " per OCR, " + (SystemClock.elapsedRealtime() - start) + " ms");
+                + ocrPages + " per OCR" + (hasTextLayerApi() ? "" : ", " + pdfBoxPages + " per PdfBox")
+                + ", " + (SystemClock.elapsedRealtime() - start) + " ms");
+    }
+
+    // ---------------------------------------------------------------------
+    // PdfBox (nur vor Android 15)
+    // ---------------------------------------------------------------------
+
+    /** PDF mit PdfBox laden. Puffert in eine Temp-Datei statt im RAM (große PDFs). null bei Fehler. */
+    private static PDDocument openWithPdfBox(File file) {
+        try {
+            return PDDocument.load(file, MemoryUsageSetting.setupTempFileOnly());
+        } catch (IOException | RuntimeException e) {
+            Log.w(TAG, "PdfBox kann " + file.getName() + " nicht laden – nur OCR", e);
+            return null;
+        }
+    }
+
+    /** Text einer Seite (0-basiert) per PdfBox, oder "" wenn keiner/unbrauchbar → dann OCR */
+    private static String extractWithPdfBox(PDDocument doc, PDFTextStripper stripper, int pageIndex) {
+        if (doc == null || stripper == null || pageIndex >= doc.getNumberOfPages()) return "";
+        try {
+            // Gedrehte Seiten: PdfBox trennt dort Wörter falsch ("C hloroplasten"). Drehung nur im
+            // Speicher auf 0 setzen – die Datei wird nicht gespeichert, der Text ist derselbe.
+            doc.getPage(pageIndex).setRotation(0);
+            stripper.setStartPage(pageIndex + 1);   // PdfBox zählt ab 1
+            stripper.setEndPage(pageIndex + 1);
+            String text = stripper.getText(doc);
+            return looksLikeGarbage(text) ? "" : text;
+        } catch (IOException | RuntimeException e) {
+            // z.B. Kopierschutz (Textextraktion verboten) oder kaputte Seite
+            Log.w(TAG, "PdfBox-Text Seite " + (pageIndex + 1) + " fehlgeschlagen – OCR", e);
+            return "";
+        }
+    }
+
+    /**
+     * Zeichensalat erkennen: PDFs mit eigener Schriftkodierung (ohne ToUnicode-Tabelle) liefern oft
+     * Ersatzzeichen oder Symbole statt Buchstaben. Dann lieber OCR.
+     */
+    static boolean looksLikeGarbage(String text) {
+        int visible = 0, letters = 0, replacement = 0;
+        for (int i = 0; i < text.length(); i++) {
+            char c = text.charAt(i);
+            if (Character.isWhitespace(c)) continue;
+            visible++;
+            if (Character.isLetterOrDigit(c)) letters++;
+            if (c == '\uFFFD') replacement++;
+        }
+        if (visible == 0) return false;   // leer ist kein Salat (Scan → OCR läuft sowieso)
+        return replacement * 10 > visible || letters * 2 < visible;   // >10 % � oder <50 % Buchstaben
+    }
+
+    private static void closeQuietly(PDDocument doc) {
+        if (doc == null) return;
+        try {
+            doc.close();
+        } catch (IOException ignored) {
+            // egal – nur lesend geöffnet
+        }
     }
 
     /** Eingebettete Textebene der Seite (leer bei Scans) */
