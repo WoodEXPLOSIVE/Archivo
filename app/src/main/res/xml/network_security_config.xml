@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <!--
+      eSCL-Scanner im Heimnetz sprechen nur unverschlüsseltes HTTP (mit selbst signierten
+      Zertifikaten bei HTTPS). Seit Android 9 ist Klartext-HTTP standardmäßig gesperrt.
+      Die App spricht ins Internet nichts an – nur mit dem Scanner im lokalen Netz.
+    -->
+    <base-config cleartextTrafficPermitted="true" />
+</network-security-config>

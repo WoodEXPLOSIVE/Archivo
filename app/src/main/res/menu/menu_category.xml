@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/action_add_subcategory"
+        android:icon="@drawable/ic_new_folder"
+        android:title="@string/new_subcategory" />
+    <item
+        android:id="@+id/action_rename"
+        android:icon="@drawable/ic_rename"
+        android:title="@string/rename" />
+    <item
+        android:id="@+id/action_delete"
+        android:icon="@drawable/ic_delete"
+        android:title="@string/delete" />
+    <item
+        android:id="@+id/action_import_pdf"
+        android:icon="@drawable/ic_pdf"
+        android:title="@string/import_pdf" />
+    <item
+        android:id="@+id/action_scan"
+        android:icon="@drawable/ic_scan"
+        android:title="@string/scan" />
+    <item
+        android:id="@+id/action_scan_camera"
+        android:icon="@drawable/ic_camera"
+        android:title="@string/scan_camera" />
+    <item
+        android:id="@+id/action_move"
+        android:icon="@drawable/ic_move"
+        android:title="@string/move" />
+    <item
+        android:id="@+id/action_select"
+        android:icon="@drawable/ic_select_all"
+        android:title="@string/select" />
+</menu>
