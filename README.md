@@ -8,6 +8,8 @@ that would otherwise pile up as paper. Documents go into categories and subcateg
 
 Everything stays on the device: no account, no cloud, offline text recognition.
 
+You can download the apk in the Releases.
+
 ## Features
 
 ### Organize

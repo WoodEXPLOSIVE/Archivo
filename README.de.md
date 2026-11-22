@@ -8,6 +8,8 @@ was sonst als Papier herumliegt. Dokumente landen in selbst angelegten Kategorie
 
 Alles bleibt auf dem Gerät: kein Konto, keine Cloud, Texterkennung offline.
 
+Die apk kann in den Veröffentlichungen heruntergeladen werden.
+
 ## Funktionen
 
 ### Ordnen
