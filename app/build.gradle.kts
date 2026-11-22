@@ -3,13 +3,13 @@ plugins {
 }
 
 android {
-    namespace = "at.woodexplosive.learnarchiver"
+    namespace = "at.woodexplosive.archivo"
     compileSdk {
         version = release(37)
     }
 
     defaultConfig {
-        applicationId = "at.woodexplosive.learnarchiver"
+        applicationId = "at.woodexplosive.archivo"
         minSdk = 23
         targetSdk = 37
         versionCode = 1

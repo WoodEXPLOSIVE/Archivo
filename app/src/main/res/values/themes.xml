@@ -1,6 +1,6 @@
 <resources>
     <!-- Material 3, hell/dunkel automatisch je nach Systemeinstellung -->
-    <style name="Theme.LearnArchiver" parent="Theme.Material3.DayNight.NoActionBar">
+    <style name="Theme.Archivo" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Eigene Farben kommen später hier rein (colorPrimary, colorSecondary, ...) -->
     </style>
 </resources>

@@ -6,12 +6,12 @@
 
     <fragment
         android:id="@+id/homeFragment"
-        android:name="at.woodexplosive.learnarchiver.ui.home.HomeFragment"
+        android:name="at.woodexplosive.archivo.ui.home.HomeFragment"
         android:label="@string/app_name" />
     <fragment
         android:id="@+id/pdfViewerFragment"
-        android:name="at.woodexplosive.learnarchiver.ui.viewer.PdfViewerFragment" />
+        android:name="at.woodexplosive.archivo.ui.viewer.PdfViewerFragment" />
     <fragment
         android:id="@+id/scanFragment"
-        android:name="at.woodexplosive.learnarchiver.ui.scan.ScanFragment" />
+        android:name="at.woodexplosive.archivo.ui.scan.ScanFragment" />
 </navigation>

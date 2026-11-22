@@ -71,7 +71,7 @@ Mit Android Studio öffnen und **Run** drücken, oder auf der Kommandozeile:
 ### Projektstruktur
 
 ```
-app/src/main/java/at/woodexplosive/learnarchiver/
+app/src/main/java/at/woodexplosive/archivo/
 ├── MainActivity.java       Seitenleiste, Suche, Import, Teilen
 ├── data/                   Room-Datenbank, DAOs, Repository, PdfIndexer (Volltext + OCR)
 ├── scan/                   eSCL-Client, Scanner-Suche, JPEG→PDF, Leerseiten-Erkennung

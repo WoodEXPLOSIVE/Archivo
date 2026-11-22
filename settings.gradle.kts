@@ -22,5 +22,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "LearnArchiver"
+rootProject.name = "Archivo"
 include(":app")

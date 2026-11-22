@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <at.woodexplosive.learnarchiver.ui.viewer.ZoomContainer
+    <at.woodexplosive.archivo.ui.viewer.ZoomContainer
         android:id="@+id/zoom_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -22,7 +22,7 @@
                 android:clipToPadding="false"
                 android:padding="8dp" />
         </HorizontalScrollView>
-    </at.woodexplosive.learnarchiver.ui.viewer.ZoomContainer>
+    </at.woodexplosive.archivo.ui.viewer.ZoomContainer>
 
     <!-- Springen zwischen den Suchtreffern (nur sichtbar, wenn aus der Inhaltssuche geöffnet) -->
     <com.google.android.material.card.MaterialCardView
